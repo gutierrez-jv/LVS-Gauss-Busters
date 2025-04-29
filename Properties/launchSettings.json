@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "LVS-Gauss-Busters (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "LVS-Gauss-Busters (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
