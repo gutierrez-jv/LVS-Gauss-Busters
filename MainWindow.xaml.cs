@@ -1,8 +1,11 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using LVS.Methods;
+using System;
+using System.Collections.Generic;
+using LVS_Gauss_Busters.Models;
 
-namespace LVS
+
+namespace LVS_Gauss_Busters
 {
     public sealed partial class MainWindow : Window
     {
@@ -11,33 +14,45 @@ namespace LVS
             this.InitializeComponent();
         }
 
-        private void Solve_Click(object sender, RoutedEventArgs e)
+        private void SolveButton_Click(object sender, RoutedEventArgs e)
         {
-            string expression = EquationInput.Text;
-            double x0 = double.TryParse(X0Input.Text, out var val1) ? val1 : 0;
-            double x1 = double.TryParse(X1Input.Text, out var val2) ? val2 : 0;
+            string equation = EquationInput.Text;
+            string method = ((ComboBoxItem)MethodSelector.SelectedItem)?.Content?.ToString();
 
-            INumericalMethod method = null;
-
-            switch ((MethodSelector.SelectedItem as ComboBoxItem)?.Content?.ToString())
+            if (!double.TryParse(X0Input.Text, out double x0))
             {
-                case "Newton-Raphson":
-                    method = new NewtonRaphson();
-                    break;
-                // Add cases for "Bisection" and "Secant" once implemented
-                default:
-                    ResultText.Text = "Please select a valid method.";
-                    return;
-            }
-
-            if (string.IsNullOrWhiteSpace(expression))
-            {
-                ResultText.Text = "Please enter a valid function expression.";
+                FinalRootText.Text = "Invalid input for X?.";
+                ResultListView.ItemsSource = null;
                 return;
             }
 
-            string result = method.Solve(expression, x0, x1);
-            ResultText.Text = result;
+            double x1 = 0;
+            if ((method == "Bisection" || method == "Secant") && !double.TryParse(X1Input.Text, out x1))
+            {
+                FinalRootText.Text = "Invalid input for X?.";
+                ResultListView.ItemsSource = null;
+                return;
+            }
+
+            try
+            {
+                List<StepResult> steps = new();
+                double root = method switch
+                {
+                    "Bisection" => EquationSolver.Bisection(equation, x0, x1, steps),
+                    "Newton-Raphson" => EquationSolver.NewtonRaphson(equation, x0, steps),
+                    "Secant" => EquationSolver.Secant(equation, x0, x1, steps),
+                    _ => throw new Exception("Unknown method")
+                };
+
+                ResultListView.ItemsSource = steps;
+                FinalRootText.Text = $"Approximate Root = {root:F5}";
+            }
+            catch (Exception ex)
+            {
+                FinalRootText.Text = $"An error occurred: {ex.Message}";
+                ResultListView.ItemsSource = null;
+            }
         }
     }
 }
