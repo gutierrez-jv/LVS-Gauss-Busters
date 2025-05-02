@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using NCalc;
-using LVS_Gauss_Busters.Models; // ✅ Use the correct StepResult
+using LVS_Gauss_Busters.Models;
 
 namespace LVS_Gauss_Busters
 {
@@ -13,6 +13,10 @@ namespace LVS_Gauss_Busters
             equation = Regex.Replace(equation, @"(\d)([a-zA-Z])", "$1*$2");
             equation = Regex.Replace(equation, @"√\(?([a-zA-Z0-9\.\+\-\*/\^]+)\)?", "Sqrt($1)", RegexOptions.IgnoreCase);
             equation = Regex.Replace(equation, @"sqrt\s*\(\s*([^)]+)\s*\)", "Sqrt($1)", RegexOptions.IgnoreCase);
+
+            // ✅ Fix log(x) issue: interpret as natural log
+            equation = Regex.Replace(equation, @"(?<![a-zA-Z])log\s*\(\s*([^)]+)\s*\)", "Ln($1)", RegexOptions.IgnoreCase);
+
             equation = Regex.Replace(equation, @"(?<![a-zA-Z])e\s*\^\s*\(?([a-zA-Z0-9\.\+\-\*/\^]+)\)?", "Exp($1)", RegexOptions.IgnoreCase);
             equation = Regex.Replace(equation, @"([a-zA-Z0-9\)\.]+)\s*\^\s*\(?([\-0-9\.\/]+)\)?", "Pow($1,$2)");
 
@@ -32,13 +36,28 @@ namespace LVS_Gauss_Busters
             return equation;
         }
 
+
         public static double EvaluateFunction(string equation, double x)
         {
             string processed = PreprocessEquation(equation);
             var expr = new Expression(processed);
             expr.Parameters["x"] = x;
+
+            expr.EvaluateFunction += (name, args) =>
+            {
+                if (name.Equals("ln", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (args.Parameters.Length != 1)
+                        throw new ArgumentException("ln() takes exactly one argument");
+
+                    double value = Convert.ToDouble(args.Parameters[0].Evaluate());
+                    args.Result = Math.Log(value); // Natural log
+                }
+            };
+
             return Convert.ToDouble(expr.Evaluate());
         }
+
 
         public static double Bisection(string equation, double xl, double xr, List<StepResult> steps)
         {
