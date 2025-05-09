@@ -178,7 +178,7 @@ namespace LVS_Gauss_Busters
                     {
                         double[,] aMatrix = new double[n, n];
                         double[] b = new double[n];
-                        double[] initialGuess = new double[n]; 
+                        double[] initialGuess = new double[n];
                         List<SystemSolutionResult> systemSteps = new();
 
                         for (int i = 0; i < n; i++)
@@ -210,7 +210,37 @@ namespace LVS_Gauss_Busters
                         }
 
                         result = EquationSolver.GaussSeidel(aMatrix, b, systemSteps, initialGuess);
-                        ResultListView.ItemsSource = systemSteps.Select(step => $"Iteration {step.Iteration}: {string.Join(", ", step.Values.Select((v, i) => $"{GetVariableLetter(i)} = {v:F5}"))} Error: {step.Errors.Sum():F5}").ToList();
+
+                        // Full solution output formatting
+                        var output = new List<string>
+                        {
+                            "Solution:",
+                            "Initial Guesses:"
+                        };
+                        output.AddRange(initialGuess.Select((g, i) => $"{GetVariableLetter(i)} = {g:F4}"));
+                        output.Add("\nStarting iterations:");
+
+                        foreach (var step in systemSteps)
+                        {
+                            output.Add($"Iteration {step.Iteration}:");
+                            for (int i = 0; i < step.Values.Count; i++)
+                            {
+                                // Generate the detailed calculation for each variable
+                                string calculation = $"{GetVariableLetter(i)} = ({b[i]}";
+                                for (int j = 0; j < n; j++)
+                                {
+                                    if (j != i)
+                                    {
+                                        calculation += $" - {aMatrix[i, j]} * {step.Values[j]:F4}";
+                                    }
+                                }
+                                calculation += $") / {aMatrix[i, i]} = {step.Values[i]:F5}";
+                                output.Add(calculation);
+                            }
+                            output.Add(""); // Blank line for separation
+                        }
+
+                        ResultListView.ItemsSource = output;
                     }
 
                     if (result != null)
@@ -231,83 +261,6 @@ namespace LVS_Gauss_Busters
 
                 return;
             }
-
-            // EQUATION-SOLVING METHODS
-            string? equation = EquationInput.Text;
-            if (string.IsNullOrWhiteSpace(equation))
-            {
-                FinalRootText.Text = "Equation input cannot be empty.";
-                ResultListView.ItemsSource = null;
-                return;
-            }
-
-            if (!double.TryParse(X0Input.Text, out double x0))
-            {
-                FinalRootText.Text = "Invalid input for initial guess (xa).";
-                ResultListView.ItemsSource = null;
-                return;
-            }
-
-            double x1 = 0;
-            if ((method == "Bisection" || method == "Secant") && !double.TryParse(X1Input.Text, out x1))
-            {
-                FinalRootText.Text = "Invalid input for second guess (xb).";
-                ResultListView.ItemsSource = null;
-                return;
-            }
-
-            try
-            {
-                List<StepResult> steps = new();
-                double? finalRoot = null;
-
-                if (method == "Bisection")
-                {
-                    finalRoot = EquationSolver.Bisection(equation, x0, x1, steps);
-                }
-                else if (method == "Secant")
-                {
-                    finalRoot = EquationSolver.Secant(equation, x0, x1, steps);
-                }
-                else if (method == "Newton-Raphson")
-                {
-                    finalRoot = EquationSolver.NewtonRaphson(equation, x0, steps);
-                }
-
-                if (steps.Any())
-                {
-                    ResultListView.ItemsSource = steps.Select(s =>
-                        $"Iter {s.Iteration}: x = {s.X:F5}, f(x) = {s.Fx:F5}, Error = {s.Error:F5}"
-                    ).ToList();
-                }
-
-                FinalRootText.Text = finalRoot.HasValue
-                    ? $"Final Root: {finalRoot.Value:F5}"
-                    : "No root found within tolerance.";
-            }
-            catch (Exception ex)
-            {
-                FinalRootText.Text = $"Error: {ex.Message}";
-                ResultListView.ItemsSource = null;
-            }
-        }
-
-
-        private List<string> FormatMatrixForDisplay(double[,] matrix)
-        {
-            var display = new List<string>();
-            int rows = matrix.GetLength(0);
-            int cols = matrix.GetLength(1);
-            for (int i = 0; i < rows; i++)
-            {
-                string row = "";
-                for (int j = 0; j < cols; j++)
-                {
-                    row += $"{matrix[i, j]:F5}\t";
-                }
-                display.Add(row);
-            }
-            return display;
         }
     }
 }

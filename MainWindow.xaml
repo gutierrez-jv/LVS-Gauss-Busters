@@ -15,8 +15,8 @@
         </Grid.RowDefinitions>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
-            <Image Source="/Assets/ghostbusters_logo-removebg-preview.png" Height="80" Margin="0,0,10,0"/>
-            <TextBlock Text="LVS Gauss Busters" FontSize="36" FontWeight="Bold" Foreground="#E10600" FontFamily="Rockwell"
+            <Image Source="/Assets/ghostbusters_logo-removebg-preview.png" Height="80" Margin="0,0,25,0"/>
+            <TextBlock Text="Gauss Busters" FontSize="36" FontWeight="Bold" Foreground="#E10600" FontFamily="Rockwell"
                        VerticalAlignment="Center" TextWrapping="Wrap"/>
         </StackPanel>
 
@@ -77,8 +77,8 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Height="350">
                     <ListView x:Name="ResultListView" Background="#2D2D2D" Foreground="White" BorderThickness="0" SelectionMode="None">
                         <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="models:StepResult">
-                                <TextBlock Text="{Binding}" FontFamily="Consolas" />
+                            <DataTemplate x:DataType="x:String">
+                                <TextBlock Text="{Binding}" FontFamily="Consolas" TextWrapping="Wrap" />
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>

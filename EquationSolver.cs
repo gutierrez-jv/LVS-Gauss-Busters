@@ -293,6 +293,8 @@ namespace LVS_Gauss_Busters
         {
             int n = matrix.GetLength(0);
 
+            steps.Add(FormatMatrix(matrix, "Initial Augmented Matrix"));
+
             for (int i = 0; i < n; i++)
             {
                 // Search for maximum in this column
@@ -314,7 +316,8 @@ namespace LVS_Gauss_Busters
                     matrix[maxRow, k] = matrix[i, k];
                     matrix[i, k] = tmp;
                 }
-                steps.Add($"Swapped row {i + 1} with row {maxRow + 1}");
+                steps.Add($"Swapped Row {i + 1} with Row {maxRow + 1}");
+                steps.Add(FormatMatrix(matrix, "After Row Swap"));
 
                 // Make all rows below this one 0 in current column
                 for (int k = i + 1; k < n; k++)
@@ -331,57 +334,38 @@ namespace LVS_Gauss_Busters
                             matrix[k, j] += c * matrix[i, j];
                         }
                     }
-                    steps.Add($"Row {k + 1} updated with multiplier {c:F5}");
+                    steps.Add($"Row {k + 1} = Row {k + 1} + ({c:F3}) * Row {i + 1}");
+                    steps.Add(FormatMatrix(matrix, "After Elimination Step"));
                 }
             }
 
-            // Solve equation Ax=b for an upper triangular matrix A
-            double[] x = new double[n];
-            for (int i = n - 1; i >= 0; i--)
-            {
-                x[i] = matrix[i, n] / matrix[i, i];
-                for (int k = i - 1; k >= 0; k--)
-                {
-                    matrix[k, n] -= matrix[k, i] * x[i];
-                }
-                steps.Add($"Solved for x[{i + 1}] = {x[i]:F5}");
-            }
-
-            return x;
-        }
-
-        public static double[] GaussJordanElimination(double[,] matrix)
-        {
-            int n = matrix.GetLength(0);
-
+            // Normalize the diagonal to 1
             for (int i = 0; i < n; i++)
             {
-                // Make the diagonal contain all ones
                 double diag = matrix[i, i];
                 for (int j = 0; j < n + 1; j++)
                 {
                     matrix[i, j] /= diag;
                 }
+                steps.Add($"Row {i + 1} = Row {i + 1} / {diag:F3}");
+            }
+            steps.Add(FormatMatrix(matrix, "After Normalizing Diagonal"));
 
-                // Make the other elements in column i zero
-                for (int k = 0; k < n; k++)
+            // Solve equation Ax=b for an upper triangular matrix A
+            double[] x = new double[n];
+            for (int i = n - 1; i >= 0; i--)
+            {
+                x[i] = matrix[i, n];
+                for (int k = i - 1; k >= 0; k--)
                 {
-                    if (k != i)
-                    {
-                        double factor = matrix[k, i];
-                        for (int j = 0; j < n + 1; j++)
-                        {
-                            matrix[k, j] -= factor * matrix[i, j];
-                        }
-                    }
+                    matrix[k, n] -= matrix[k, i] * x[i];
                 }
             }
 
-            // Extract solution
-            double[] x = new double[n];
+            steps.Add("Back Substitution:");
             for (int i = 0; i < n; i++)
             {
-                x[i] = matrix[i, n];
+                steps.Add($"x[{i + 1}] = {x[i]:F4}");
             }
 
             return x;
@@ -391,17 +375,20 @@ namespace LVS_Gauss_Busters
         {
             int n = matrix.GetLength(0);
 
+            steps.Add(FormatMatrix(matrix, "Initial Augmented Matrix"));
+
             for (int i = 0; i < n; i++)
             {
-                // Make the diagonal contain all ones
+                // Normalize the diagonal element to 1
                 double diag = matrix[i, i];
                 for (int j = 0; j < n + 1; j++)
                 {
                     matrix[i, j] /= diag;
                 }
-                steps.Add($"Normalized row {i + 1}");
+                steps.Add($"Row {i + 1} = Row {i + 1} / {diag:F3}");
+                steps.Add(FormatMatrix(matrix, "After Normalizing Row"));
 
-                // Make the other elements in column i zero
+                // Eliminate all other elements in column i
                 for (int k = 0; k < n; k++)
                 {
                     if (k != i)
@@ -411,7 +398,8 @@ namespace LVS_Gauss_Busters
                         {
                             matrix[k, j] -= factor * matrix[i, j];
                         }
-                        steps.Add($"Row {k + 1} updated to eliminate column {i + 1}");
+                        steps.Add($"Row {k + 1} = Row {k + 1} - ({factor:F3}) * Row {i + 1}");
+                        steps.Add(FormatMatrix(matrix, "After Elimination Step"));
                     }
                 }
             }
@@ -421,7 +409,12 @@ namespace LVS_Gauss_Busters
             for (int i = 0; i < n; i++)
             {
                 x[i] = matrix[i, n];
-                steps.Add($"Solved for x[{i + 1}] = {x[i]:F5}");
+            }
+
+            steps.Add("Solution:");
+            for (int i = 0; i < n; i++)
+            {
+                steps.Add($"x[{i + 1}] = {x[i]:F4}");
             }
 
             return x;
@@ -493,6 +486,31 @@ namespace LVS_Gauss_Busters
                 Console.WriteLine($"Error calculating derivative of '{equation}' at x = {x}: {ex.Message}");
                 throw new Exception($"Error calculating derivative of '{equation}' at x = {x}: {ex.Message}");
             }
+        }
+
+        private static string FormatMatrix(double[,] matrix, string title = "")
+        {
+            int rows = matrix.GetLength(0);
+            int cols = matrix.GetLength(1);
+            var result = new List<string>();
+
+            if (!string.IsNullOrEmpty(title))
+            {
+                result.Add($"--- {title} ---");
+            }
+
+            for (int i = 0; i < rows; i++)
+            {
+                var row = "| ";
+                for (int j = 0; j < cols; j++)
+                {
+                    row += $"{matrix[i, j],8:F3} ";
+                }
+                row += "|";
+                result.Add(row);
+            }
+
+            return string.Join("\n", result);
         }
     }
 }
