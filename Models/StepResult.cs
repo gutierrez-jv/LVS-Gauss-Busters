@@ -26,5 +26,8 @@ namespace LVS_Gauss_Busters.Models
         public string FxlFormatted => Fxl.ToString("F5");
         public string FxrFormatted => Fxr.ToString("F5");
         public string FxmFormatted => Fxm.ToString("F5");
+        public string XFormatted => X.ToString("F5");
+        public string FxFormatted => Fx.ToString("F5");
+        public string ErrorFormatted => Error.ToString("F5");
     }
 }

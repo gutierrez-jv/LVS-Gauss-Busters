@@ -40,42 +40,68 @@ namespace LVS_Gauss_Busters
 
         public static double EvaluateFunction(string equation, double x)
         {
-            string processed = PreprocessEquation(equation);
-            var expr = new Expression(processed);
-            expr.Parameters["x"] = x;
-
-            expr.EvaluateFunction += (name, args) =>
+            try
             {
-                if (name.Equals("ln", StringComparison.OrdinalIgnoreCase))
+                string processed = PreprocessEquation(equation);
+                var expr = new Expression(processed);
+                expr.Parameters["x"] = x;
+
+                expr.EvaluateFunction += (name, args) =>
                 {
-                    if (args.Parameters.Length != 1)
-                        throw new ArgumentException("ln() takes exactly one argument");
+                    if (name.Equals("ln", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (args.Parameters.Length != 1)
+                            throw new ArgumentException("ln() takes exactly one argument");
 
-                    double value = Convert.ToDouble(args.Parameters[0].Evaluate());
-                    args.Result = Math.Log(value); // Natural log
-                }
-            };
+                        double value = Convert.ToDouble(args.Parameters[0].Evaluate());
+                        args.Result = Math.Log(value); // Natural log
+                    }
+                };
 
-            return Convert.ToDouble(expr.Evaluate());
+                double result = Convert.ToDouble(expr.Evaluate());
+                Console.WriteLine($"EvaluateFunction: equation = {equation}, x = {x}, result = {result}");
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error evaluating the equation '{equation}' at x = {x}: {ex.Message}");
+                throw new Exception($"Error evaluating the equation '{equation}' at x = {x}: {ex.Message}");
+            }
         }
 
 
         public static double Bisection(string equation, double xl, double xr, List<StepResult> steps)
         {
             const double tolerance = 0.0001;
+            const int maxIterations = 1000;
             int iteration = 1;
-            double xm = 0;
 
-            while ((xr - xl) > tolerance)
+            // Evaluate function values at xl and xr
+            double fxl = EvaluateFunction(equation, xl);
+            double fxr = EvaluateFunction(equation, xr);
+
+            // Check if the initial guesses bracket the root
+            if (fxl * fxr > 0)
             {
+                throw new ArgumentException($"The initial guesses do not bracket the root. Ensure f(xl) and f(xr) have opposite signs. f(xl) = {fxl:F5}, f(xr) = {fxr:F5}");
+            }
+
+            double xm = xl;
+            double previousXm = xl;
+
+            while ((xr - xl) > tolerance && iteration <= maxIterations)
+            {
+                previousXm = xm;
                 xm = (xl + xr) / 2;
-                double fxl = EvaluateFunction(equation, xl);
-                double fxr = EvaluateFunction(equation, xr);
                 double fxm = EvaluateFunction(equation, xm);
 
+                // Add the current step to the steps list
                 steps.Add(new StepResult
                 {
                     Iteration = iteration,
+                    X = xm,
+                    Fx = fxm,
+                    Error = iteration == 1 ? 0 : Math.Abs(xm - previousXm),
                     Xl = xl,
                     Xr = xr,
                     Xm = xm,
@@ -84,24 +110,46 @@ namespace LVS_Gauss_Busters
                     Fxm = fxm
                 });
 
+                Console.WriteLine($"Iter {iteration}: xl = {xl}, xr = {xr}, xm = {xm}, f(xl) = {fxl}, f(xr) = {fxr}, f(xm) = {fxm}");
+
+                // Update the interval based on the sign of f(xm)
                 if (fxl * fxm < 0)
+                {
                     xr = xm;
+                    fxr = fxm;
+                }
                 else
+                {
                     xl = xm;
+                    fxl = fxm;
+                }
+
+                // Check for convergence
+                if (Math.Abs(fxm) < tolerance || Math.Abs(xr - xl) < tolerance)
+                    break;
 
                 iteration++;
+            }
+
+            if (iteration > maxIterations)
+            {
+                throw new Exception("Bisection method did not converge within the maximum number of iterations.");
             }
 
             return xm;
         }
 
+
+
         public static double NewtonRaphson(string equation, double x0, List<StepResult> steps)
         {
             const double tolerance = 0.0001;
+            const int maxIterations = 1000;
             int iteration = 1;
             double x = x0;
+            double previousX = 0;
 
-            while (true)
+            while (iteration <= maxIterations)
             {
                 double fx = EvaluateFunction(equation, x);
                 double dfx = Derivative(equation, x);
@@ -109,35 +157,42 @@ namespace LVS_Gauss_Busters
                 if (Math.Abs(dfx) < 1e-6)
                     throw new Exception("Derivative too small. Newton-Raphson may fail.");
 
+                previousX = x;
                 double xNew = x - fx / dfx;
 
                 steps.Add(new StepResult
                 {
                     Iteration = iteration,
+                    X = xNew,
+                    Fx = fx,
+                    Error = Math.Abs(xNew - previousX),
                     Xl = x,
                     Xm = xNew,
                     Fxl = fx,
                     Fxm = dfx,
-                    Fxr = 0 // Optional
+                    Fxr = 0
                 });
 
+                Console.WriteLine($"Iter {iteration}: x = {x}, f(x) = {fx}, f'(x) = {dfx}");
+
                 if (Math.Abs(xNew - x) < tolerance)
-                    break;
+                    return xNew;
 
                 x = xNew;
                 iteration++;
             }
 
-            return x;
+            throw new Exception("Newton-Raphson method did not converge within the maximum number of iterations.");
         }
 
         public static double Secant(string equation, double x0, double x1, List<StepResult> steps)
         {
             const double tolerance = 0.0001;
+            const int maxIterations = 1000;
             int iteration = 1;
             double x2 = 0;
 
-            while (true)
+            while (iteration <= maxIterations)
             {
                 double fx0 = EvaluateFunction(equation, x0);
                 double fx1 = EvaluateFunction(equation, x1);
@@ -145,11 +200,15 @@ namespace LVS_Gauss_Busters
                 if (Math.Abs(fx1 - fx0) < 1e-6)
                     throw new Exception("Division by zero risk in Secant method.");
 
+                double previousX2 = x2;
                 x2 = x1 - fx1 * (x1 - x0) / (fx1 - fx0);
 
                 steps.Add(new StepResult
                 {
                     Iteration = iteration,
+                    X = x2,
+                    Fx = EvaluateFunction(equation, x2),
+                    Error = Math.Abs(x2 - previousX2),
                     Xl = x0,
                     Xr = x1,
                     Xm = x2,
@@ -158,15 +217,17 @@ namespace LVS_Gauss_Busters
                     Fxm = EvaluateFunction(equation, x2)
                 });
 
+                Console.WriteLine($"Iter {iteration}: x0 = {x0}, x1 = {x1}, x2 = {x2}, f(x0) = {fx0}, f(x1) = {fx1}");
+
                 if (Math.Abs(x2 - x1) < tolerance)
-                    break;
+                    return x2;
 
                 x0 = x1;
                 x1 = x2;
                 iteration++;
             }
 
-            return x2;
+            throw new Exception("Secant method did not converge within the maximum number of iterations.");
         }
 
 
@@ -421,7 +482,17 @@ namespace LVS_Gauss_Busters
         private static double Derivative(string equation, double x)
         {
             const double h = 1e-5;
-            return (EvaluateFunction(equation, x + h) - EvaluateFunction(equation, x - h)) / (2 * h);
+            try
+            {
+                double derivative = (EvaluateFunction(equation, x + h) - EvaluateFunction(equation, x - h)) / (2 * h);
+                Console.WriteLine($"Derivative: equation = {equation}, x = {x}, derivative = {derivative}");
+                return derivative;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error calculating derivative of '{equation}' at x = {x}: {ex.Message}");
+                throw new Exception($"Error calculating derivative of '{equation}' at x = {x}: {ex.Message}");
+            }
         }
     }
 }
