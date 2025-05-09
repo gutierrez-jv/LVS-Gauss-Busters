@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using NCalc;
 using LVS_Gauss_Busters.Models;
+using System.Linq;
 
 namespace LVS_Gauss_Busters
 {
@@ -167,6 +168,255 @@ namespace LVS_Gauss_Busters
 
             return x2;
         }
+
+
+        public static double[] GaussianElimination(double[,] matrix)
+        {
+            int n = matrix.GetLength(0);
+
+            for (int i = 0; i < n; i++)
+            {
+                // Search for maximum in this column
+                double maxEl = Math.Abs(matrix[i, i]);
+                int maxRow = i;
+                for (int k = i + 1; k < n; k++)
+                {
+                    if (Math.Abs(matrix[k, i]) > maxEl)
+                    {
+                        maxEl = Math.Abs(matrix[k, i]);
+                        maxRow = k;
+                    }
+                }
+
+                // Swap maximum row with current row (column by column)
+                for (int k = i; k < n + 1; k++)
+                {
+                    double tmp = matrix[maxRow, k];
+                    matrix[maxRow, k] = matrix[i, k];
+                    matrix[i, k] = tmp;
+                }
+
+                // Make all rows below this one 0 in current column
+                for (int k = i + 1; k < n; k++)
+                {
+                    double c = -matrix[k, i] / matrix[i, i];
+                    for (int j = i; j < n + 1; j++)
+                    {
+                        if (i == j)
+                        {
+                            matrix[k, j] = 0;
+                        }
+                        else
+                        {
+                            matrix[k, j] += c * matrix[i, j];
+                        }
+                    }
+                }
+            }
+
+            // Solve equation Ax=b for an upper triangular matrix A
+            double[] x = new double[n];
+            for (int i = n - 1; i >= 0; i--)
+            {
+                x[i] = matrix[i, n] / matrix[i, i];
+                for (int k = i - 1; k >= 0; k--)
+                {
+                    matrix[k, n] -= matrix[k, i] * x[i];
+                }
+            }
+
+            return x;
+        }
+
+        public static double[] GaussianElimination(double[,] matrix, List<string> steps)
+        {
+            int n = matrix.GetLength(0);
+
+            for (int i = 0; i < n; i++)
+            {
+                // Search for maximum in this column
+                double maxEl = Math.Abs(matrix[i, i]);
+                int maxRow = i;
+                for (int k = i + 1; k < n; k++)
+                {
+                    if (Math.Abs(matrix[k, i]) > maxEl)
+                    {
+                        maxEl = Math.Abs(matrix[k, i]);
+                        maxRow = k;
+                    }
+                }
+
+                // Swap maximum row with current row (column by column)
+                for (int k = i; k < n + 1; k++)
+                {
+                    double tmp = matrix[maxRow, k];
+                    matrix[maxRow, k] = matrix[i, k];
+                    matrix[i, k] = tmp;
+                }
+                steps.Add($"Swapped row {i + 1} with row {maxRow + 1}");
+
+                // Make all rows below this one 0 in current column
+                for (int k = i + 1; k < n; k++)
+                {
+                    double c = -matrix[k, i] / matrix[i, i];
+                    for (int j = i; j < n + 1; j++)
+                    {
+                        if (i == j)
+                        {
+                            matrix[k, j] = 0;
+                        }
+                        else
+                        {
+                            matrix[k, j] += c * matrix[i, j];
+                        }
+                    }
+                    steps.Add($"Row {k + 1} updated with multiplier {c:F5}");
+                }
+            }
+
+            // Solve equation Ax=b for an upper triangular matrix A
+            double[] x = new double[n];
+            for (int i = n - 1; i >= 0; i--)
+            {
+                x[i] = matrix[i, n] / matrix[i, i];
+                for (int k = i - 1; k >= 0; k--)
+                {
+                    matrix[k, n] -= matrix[k, i] * x[i];
+                }
+                steps.Add($"Solved for x[{i + 1}] = {x[i]:F5}");
+            }
+
+            return x;
+        }
+
+        public static double[] GaussJordanElimination(double[,] matrix)
+        {
+            int n = matrix.GetLength(0);
+
+            for (int i = 0; i < n; i++)
+            {
+                // Make the diagonal contain all ones
+                double diag = matrix[i, i];
+                for (int j = 0; j < n + 1; j++)
+                {
+                    matrix[i, j] /= diag;
+                }
+
+                // Make the other elements in column i zero
+                for (int k = 0; k < n; k++)
+                {
+                    if (k != i)
+                    {
+                        double factor = matrix[k, i];
+                        for (int j = 0; j < n + 1; j++)
+                        {
+                            matrix[k, j] -= factor * matrix[i, j];
+                        }
+                    }
+                }
+            }
+
+            // Extract solution
+            double[] x = new double[n];
+            for (int i = 0; i < n; i++)
+            {
+                x[i] = matrix[i, n];
+            }
+
+            return x;
+        }
+
+        public static double[] GaussJordanElimination(double[,] matrix, List<string> steps)
+        {
+            int n = matrix.GetLength(0);
+
+            for (int i = 0; i < n; i++)
+            {
+                // Make the diagonal contain all ones
+                double diag = matrix[i, i];
+                for (int j = 0; j < n + 1; j++)
+                {
+                    matrix[i, j] /= diag;
+                }
+                steps.Add($"Normalized row {i + 1}");
+
+                // Make the other elements in column i zero
+                for (int k = 0; k < n; k++)
+                {
+                    if (k != i)
+                    {
+                        double factor = matrix[k, i];
+                        for (int j = 0; j < n + 1; j++)
+                        {
+                            matrix[k, j] -= factor * matrix[i, j];
+                        }
+                        steps.Add($"Row {k + 1} updated to eliminate column {i + 1}");
+                    }
+                }
+            }
+
+            // Extract solution
+            double[] x = new double[n];
+            for (int i = 0; i < n; i++)
+            {
+                x[i] = matrix[i, n];
+                steps.Add($"Solved for x[{i + 1}] = {x[i]:F5}");
+            }
+
+            return x;
+        }
+
+        public static double[] GaussSeidel(double[,] A = null, double[] b = null, List<SystemSolutionResult> systemSteps = null, double[] initialGuess = null, double tolerance = 1e-10, int maxIterations = 1000)
+        {
+            if (A == null || b == null || systemSteps == null)
+            {
+                throw new ArgumentNullException("The coefficient matrix (A), constant vector (b), and systemSteps list cannot be null.");
+            }
+
+            int n = b.Length;
+            double[] x = new double[n];
+            if (initialGuess != null)
+                Array.Copy(initialGuess, x, n);
+
+            for (int iter = 0; iter < maxIterations; iter++)
+            {
+                double[] xNew = new double[n];
+                Array.Copy(x, xNew, n);
+
+                for (int i = 0; i < n; i++)
+                {
+                    double sum = b[i];
+                    for (int j = 0; j < n; j++)
+                    {
+                        if (j != i)
+                            sum -= A[i, j] * xNew[j];
+                    }
+                    xNew[i] = sum / A[i, i];
+                }
+
+                var errors = new List<double>();
+                for (int i = 0; i < n; i++)
+                {
+                    errors.Add(Math.Abs(xNew[i] - x[i]));
+                }
+
+                systemSteps.Add(new SystemSolutionResult
+                {
+                    Iteration = iter + 1,
+                    Values = xNew.ToList(),
+                    Errors = errors
+                });
+
+                double error = errors.Sum();
+                if (error < tolerance)
+                    break;
+
+                x = xNew;
+            }
+
+            return x;
+        }
+
 
         private static double Derivative(string equation, double x)
         {

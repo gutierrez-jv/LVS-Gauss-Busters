@@ -27,22 +27,36 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Background="#1A1A1A" CornerRadius="15" Padding="30" Spacing="15" Margin="0,0,10,0">
-                <TextBlock Text="Equation (in terms of x):" Foreground="White"/>
-                <TextBox x:Name="EquationInput" PlaceholderText="e.g., x^2 - 2" Background="#2D2D2D" Foreground="White"/>
-
-                <TextBlock Text="Initial Guess (xa):" Foreground="White"/>
-                <TextBox x:Name="X0Input" PlaceholderText="e.g., 1" Background="#2D2D2D" Foreground="White"/>
-
-                <TextBlock Text="Second Guess (xb):" Foreground="White"/>
-                <TextBox x:Name="X1Input" PlaceholderText="e.g., 2" Background="#2D2D2D" Foreground="White"/>
-
                 <TextBlock Text="Select Method:" Foreground="White"/>
-                <ComboBox x:Name="MethodSelector" Background="#2D2D2D" Foreground="White">
+                <ComboBox x:Name="MethodSelector" Background="#2D2D2D" Foreground="White" SelectionChanged="MethodSelector_SelectionChanged">
                     <ComboBoxItem Content="Bisection"/>
                     <ComboBoxItem Content="Newton-Raphson"/>
                     <ComboBoxItem Content="Secant"/>
+                    <ComboBoxItem Content="Gaussian Elimination"/>
+                    <ComboBoxItem Content="Gauss-Jordan"/>
+                    <ComboBoxItem Content="Gauss-Seidel"/>
                 </ComboBox>
 
+                <TextBlock Text="Number of Equations:" Foreground="White" x:Name="NumberOfEquationsLabel"/>
+                <StackPanel x:Name="NumberOfEquationsPanel">
+                    <TextBox x:Name="NumberOfEquationsTextBox" Text="3" InputScope="Number" TextChanged="NumberOfEquationsTextBox_TextChanged"/>
+                </StackPanel>
+                <StackPanel x:Name="SingleEquationPanel">
+                    <TextBlock Text="Equation (in terms of x):" Foreground="White"/>
+                    <TextBox x:Name="EquationInput" PlaceholderText="e.g., x^2 - 2" Background="#2D2D2D" Foreground="White"/>
+                </StackPanel>
+                <StackPanel x:Name="InitialGuessXbPanel">
+                    <TextBlock Text="Second Guess (xb):" Foreground="White"/>
+                    <TextBox x:Name="X1Input" PlaceholderText="e.g., 2" Background="#2D2D2D" Foreground="White"/>
+                </StackPanel>
+                <StackPanel x:Name="InitialGuessXaPanel">
+                    <TextBlock Text="Initial Guess (xa):" Foreground="White"/>
+                    <TextBox x:Name="X0Input" PlaceholderText="e.g., 1" Background="#2D2D2D" Foreground="White"/>
+                </StackPanel>
+                <TextBlock x:Name="InitialGuessesLabel" Text="Initial Guesses:" Foreground="White"/>
+                <StackPanel x:Name="InitialGuessesInputPanel" Orientation="Vertical" />
+                <TextBlock x:Name="EquationsLabel" Text="Equations:" Foreground="White"/>
+                <StackPanel x:Name="EquationsInputPanel" Orientation="Vertical" />
                 <Button x:Name="SolverButton"
                         Content="BUST IT!"
                         Click="SolveButton_Click"
@@ -60,47 +74,11 @@
                 <TextBlock Text="Solution Steps" FontSize="26" FontWeight="Bold" FontFamily="Rockwell"
                            Foreground="White" Margin="0 0 0 10"/>
 
-                <Grid Background="#3A3A3A" Padding="4" Margin="0,0,0,5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="Iteration" Foreground="White" FontWeight="Bold" Grid.Column="0" HorizontalAlignment="Center"/>
-                    <TextBlock Text="Xl" Foreground="White" FontWeight="Bold" Grid.Column="1" HorizontalAlignment="Center"/>
-                    <TextBlock Text="Xr" Foreground="White" FontWeight="Bold" Grid.Column="2" HorizontalAlignment="Center"/>
-                    <TextBlock Text="Xm" Foreground="White" FontWeight="Bold" Grid.Column="3" HorizontalAlignment="Center"/>
-                    <TextBlock Text="F(Xl)" Foreground="White" FontWeight="Bold" Grid.Column="4" HorizontalAlignment="Center"/>
-                    <TextBlock Text="F(Xr)" Foreground="White" FontWeight="Bold" Grid.Column="5" HorizontalAlignment="Center"/>
-                    <TextBlock Text="F(Xm)" Foreground="White" FontWeight="Bold" Grid.Column="6" HorizontalAlignment="Center"/>
-                </Grid>
-
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Height="250">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Height="350">
                     <ListView x:Name="ResultListView" Background="#2D2D2D" Foreground="White" BorderThickness="0" SelectionMode="None">
                         <ListView.ItemTemplate>
                             <DataTemplate x:DataType="models:StepResult">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="{x:Bind Iteration}" Grid.Column="0" TextWrapping="Wrap" TextAlignment="Center"/>
-                                    <TextBlock Text="{x:Bind Xl}" Grid.Column="1" TextWrapping="Wrap" TextAlignment="Center"/>
-                                    <TextBlock Text="{x:Bind Xr}" Grid.Column="2" TextWrapping="Wrap" TextAlignment="Center"/>
-                                    <TextBlock Text="{x:Bind Xm}" Grid.Column="3" TextWrapping="Wrap" TextAlignment="Center"/>
-                                    <TextBlock Text="{x:Bind Fxl}" Grid.Column="4" TextWrapping="Wrap" TextAlignment="Center"/>
-                                    <TextBlock Text="{x:Bind Fxr}" Grid.Column="5" TextWrapping="Wrap" TextAlignment="Center"/>
-                                    <TextBlock Text="{x:Bind Fxm}" Grid.Column="6" TextWrapping="Wrap" TextAlignment="Center"/>
-                                </Grid>
+                                <TextBlock Text="{Binding}" FontFamily="Consolas" />
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
