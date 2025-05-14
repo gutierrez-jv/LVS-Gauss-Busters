@@ -35,7 +35,10 @@
                     <ComboBoxItem Content="Gaussian Elimination"/>
                     <ComboBoxItem Content="Gauss-Jordan"/>
                     <ComboBoxItem Content="Gauss-Seidel"/>
+                    <ComboBoxItem Content="Linear Regression"/>
+                    <ComboBoxItem Content="Polynomial Regression"/>
                 </ComboBox>
+
 
                 <TextBlock Text="Number of Equations:" Foreground="White" x:Name="NumberOfEquationsLabel"/>
                 <StackPanel x:Name="NumberOfEquationsPanel">
@@ -57,6 +60,17 @@
                 <StackPanel x:Name="InitialGuessesInputPanel" Orientation="Vertical" />
                 <TextBlock x:Name="EquationsLabel" Text="Equations:" Foreground="White"/>
                 <StackPanel x:Name="EquationsInputPanel" Orientation="Vertical" />
+
+                <StackPanel x:Name="RegressionInputPanel" Visibility="Collapsed" Spacing="10" Margin="0,10,0,0">
+                    <TextBlock Text="Enter X values (comma-separated):" Foreground="White"/>
+                    <TextBox x:Name="XValuesTextBox" PlaceholderText="e.g., 1, 2, 3" Background="#2D2D2D" Foreground="White"/>
+
+                    <TextBlock Text="Enter Y values (comma-separated):" Foreground="White"/>
+                    <TextBox x:Name="YValuesTextBox" PlaceholderText="e.g., 2, 4, 6" Background="#2D2D2D" Foreground="White"/>
+
+                    <TextBlock x:Name="PolynomialDegreeLabel" Text="Enter Polynomial Degree:" Foreground="White" Visibility="Collapsed"/>
+                    <TextBox x:Name="PolynomialDegreeTextBox" PlaceholderText="e.g., 2" Background="#2D2D2D" Foreground="White" Visibility="Collapsed"/>
+                </StackPanel>
                 <Button x:Name="SolverButton"
                         Content="BUST IT!"
                         Click="SolveButton_Click"

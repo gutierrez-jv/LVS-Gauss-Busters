@@ -44,6 +44,17 @@ namespace LVS_Gauss_Busters
                 string? method = ((ComboBoxItem?)MethodSelector.SelectedItem)?.Content?.ToString();
                 InitialGuessXbPanel.Visibility = (method == "Bisection" || method == "Secant") ? Visibility.Visible : Visibility.Collapsed;
             }
+
+            // Show regression inputs for regression methods
+            bool isRegression = MethodSelector.SelectedItem is ComboBoxItem regressionItem &&
+                                (regressionItem.Content?.ToString() == "Linear Regression" ||
+                                 regressionItem.Content?.ToString() == "Polynomial Regression");
+
+            RegressionInputPanel.Visibility = isRegression ? Visibility.Visible : Visibility.Collapsed;
+            PolynomialDegreeLabel.Visibility = MethodSelector.SelectedItem is ComboBoxItem polyItem &&
+                                                polyItem.Content?.ToString() == "Polynomial Regression"
+                                                ? Visibility.Visible : Visibility.Collapsed;
+            PolynomialDegreeTextBox.Visibility = PolynomialDegreeLabel.Visibility;
         }
 
         private void GenerateEquationInputFields()
@@ -261,6 +272,70 @@ namespace LVS_Gauss_Busters
 
                 return;
             }
+            else if (method == "Linear Regression")
+            {
+                try
+                {
+                    double[] x = InputXValues(); // Implement a method to read X values
+                    double[] y = InputYValues(); // Implement a method to read Y values
+
+                    var (slope, intercept) = EquationSolver.LinearRegression(x, y);
+                    FinalRootText.Text = $"y = {slope:F4}x + {intercept:F4}";
+                }
+                catch (Exception ex)
+                {
+                    FinalRootText.Text = $"Error: {ex.Message}";
+                }
+            }
+            else if (method == "Polynomial Regression")
+            {
+                try
+                {
+                    double[] x = InputXValues(); // Implement a method to read X values
+                    double[] y = InputYValues(); // Implement a method to read Y values
+                    int degree = GetPolynomialDegree(); // Implement a method to get the degree
+
+                    double[] coefficients = EquationSolver.PolynomialRegression(x, y, degree);
+                    FinalRootText.Text = "y = " + string.Join(" + ", coefficients.Select((c, i) => $"{c:F4}x^{i}"));
+                }
+                catch (Exception ex)
+                {
+                    FinalRootText.Text = $"Error: {ex.Message}";
+                }
+            }
+        }
+
+        private double[] InputXValues()
+        {
+            if (string.IsNullOrWhiteSpace(XValuesTextBox.Text))
+                throw new ArgumentException("X values cannot be empty.");
+
+            return XValuesTextBox.Text
+                .Split(',')
+                .Select(value => double.Parse(value.Trim()))
+                .ToArray();
+        }
+
+        private double[] InputYValues()
+        {
+            if (string.IsNullOrWhiteSpace(YValuesTextBox.Text))
+                throw new ArgumentException("Y values cannot be empty.");
+
+            return YValuesTextBox.Text
+                .Split(',')
+                .Select(value => double.Parse(value.Trim()))
+                .ToArray();
+        }
+
+        private int GetPolynomialDegree()
+        {
+            if (string.IsNullOrWhiteSpace(PolynomialDegreeTextBox.Text))
+                throw new ArgumentException("Polynomial degree cannot be empty.");
+
+            if (!int.TryParse(PolynomialDegreeTextBox.Text, out int degree) || degree < 0)
+                throw new ArgumentException("Polynomial degree must be a non-negative integer.");
+
+            return degree;
         }
     }
 }

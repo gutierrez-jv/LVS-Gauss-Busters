@@ -231,7 +231,7 @@ namespace LVS_Gauss_Busters
         }
 
 
-        public static double[] GaussianElimination(double[,] matrix)
+        public static double[] GaussianElimination(double[,] matrix, double[] rhs)
         {
             int n = matrix.GetLength(0);
 
@@ -511,6 +511,45 @@ namespace LVS_Gauss_Busters
             }
 
             return string.Join("\n", result);
+        }
+
+        public static (double Slope, double Intercept) LinearRegression(double[] x, double[] y)
+        {
+            if (x.Length != y.Length)
+                throw new ArgumentException("Input arrays must have the same length.");
+
+            int n = x.Length;
+            double sumX = x.Sum();
+            double sumY = y.Sum();
+            double sumXY = x.Zip(y, (xi, yi) => xi * yi).Sum();
+            double sumX2 = x.Sum(xi => xi * xi);
+
+            double slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            double intercept = (sumY - slope * sumX) / n;
+
+            return (slope, intercept);
+        }
+
+        public static double[] PolynomialRegression(double[] x, double[] y, int degree)
+        {
+            if (x.Length != y.Length)
+                throw new ArgumentException("Input arrays must have the same length.");
+
+            int n = x.Length;
+            var vandermondeMatrix = new double[n, degree + 1];
+            var rhs = new double[n];
+
+            for (int i = 0; i < n; i++)
+            {
+                for (int j = 0; j <= degree; j++)
+                {
+                    vandermondeMatrix[i, j] = Math.Pow(x[i], j);
+                }
+                rhs[i] = y[i];
+            }
+
+            // Solve using Gaussian Elimination
+            return GaussianElimination(vandermondeMatrix, rhs);
         }
     }
 }
