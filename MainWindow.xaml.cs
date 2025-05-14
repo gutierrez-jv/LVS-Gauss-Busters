@@ -139,6 +139,118 @@ namespace LVS_Gauss_Busters
                 return;
             }
 
+            if (method == "Bisection")
+            {
+                if (string.IsNullOrWhiteSpace(EquationInput.Text))
+                {
+                    FinalRootText.Text = "Please enter an equation.";
+                    ResultListView.ItemsSource = null;
+                    return;
+                }
+                if (!double.TryParse(X0Input.Text, out double xa))
+                {
+                    FinalRootText.Text = "Invalid input for initial guess (xa).";
+                    ResultListView.ItemsSource = null;
+                    return;
+                }
+                if (!double.TryParse(X1Input.Text, out double xb))
+                {
+                    FinalRootText.Text = "Invalid input for second guess (xb).";
+                    ResultListView.ItemsSource = null;
+                    return;
+                }
+
+                List<StepResult> steps = new();
+                try
+                {
+                    double root = EquationSolver.Bisection(EquationInput.Text, xa, xb, steps);
+                    ResultListView.ItemsSource = steps.Select(step =>
+                        $"Iter: {step.Iteration}, xl: {step.Xl:F4}, xr: {step.Xr:F4}, xm: {step.Xm:F4}, f(xm): {step.Fxm:F4}, Error: {step.Error:F4}"
+                    ).ToList();
+                    FinalRootText.Text = $"Approximate Root: {root:F5}";
+                }
+                catch (ArgumentException ex)
+                {
+                    FinalRootText.Text = $"Error: {ex.Message}";
+                    ResultListView.ItemsSource = null;
+                }
+                catch (Exception ex) // Catch other potential errors
+                {
+                    FinalRootText.Text = $"Error during Bisection: {ex.Message}";
+                    ResultListView.ItemsSource = null;
+                }
+                return;
+            }
+            // NEWTON-RAPHSON METHOD
+            else if (method == "Newton-Raphson")
+            {
+                if (string.IsNullOrWhiteSpace(EquationInput.Text))
+                {
+                    FinalRootText.Text = "Please enter an equation.";
+                    ResultListView.ItemsSource = null;
+                    return;
+                }
+                if (!double.TryParse(X0Input.Text, out double x0))
+                {
+                    FinalRootText.Text = "Invalid input for initial guess (x0).";
+                    ResultListView.ItemsSource = null;
+                    return;
+                }
+
+                List<StepResult> steps = new();
+                try
+                {
+                    double root = EquationSolver.NewtonRaphson(EquationInput.Text, x0, steps);
+                    ResultListView.ItemsSource = steps.Select(step =>
+                        $"Iter: {step.Iteration}, x: {step.X:F4}, f(x): {step.Fx:F4}, f'(x): {step.Fxm:F4}, Error: {step.Error:F4}"
+                    ).ToList();
+                    FinalRootText.Text = $"Approximate Root: {root:F5}";
+                }
+                catch (Exception ex)
+                {
+                    FinalRootText.Text = $"Error during Newton-Raphson: {ex.Message}";
+                    ResultListView.ItemsSource = null;
+                }
+                return;
+            }
+            // SECANT METHOD
+            else if (method == "Secant")
+            {
+                if (string.IsNullOrWhiteSpace(EquationInput.Text))
+                {
+                    FinalRootText.Text = "Please enter an equation.";
+                    ResultListView.ItemsSource = null;
+                    return;
+                }
+                if (!double.TryParse(X0Input.Text, out double x0))
+                {
+                    FinalRootText.Text = "Invalid input for first guess (x0).";
+                    ResultListView.ItemsSource = null;
+                    return;
+                }
+                if (!double.TryParse(X1Input.Text, out double x1))
+                {
+                    FinalRootText.Text = "Invalid input for second guess (x1).";
+                    ResultListView.ItemsSource = null;
+                    return;
+                }
+
+                List<StepResult> steps = new();
+                try
+                {
+                    double root = EquationSolver.Secant(EquationInput.Text, x0, x1, steps);
+                    ResultListView.ItemsSource = steps.Select(step =>
+                        $"Iter: {step.Iteration}, x0: {step.Xl:F4}, x1: {step.Xr:F4}, x2: {step.Xm:F4}, f(x2): {step.Fx:F4}, Error: {step.Error:F4}"
+                    ).ToList();
+                    FinalRootText.Text = $"Approximate Root: {root:F5}";
+                }
+                catch (Exception ex)
+                {
+                    FinalRootText.Text = $"Error during Secant: {ex.Message}";
+                    ResultListView.ItemsSource = null;
+                }
+                return;
+            }
             // LINEAR SYSTEM METHODS
             if (method.Contains("Gaussian") || method.Contains("Gauss"))
             {
@@ -281,6 +393,7 @@ namespace LVS_Gauss_Busters
 
                     var (slope, intercept) = EquationSolver.LinearRegression(x, y);
                     FinalRootText.Text = $"y = {slope:F4}x + {intercept:F4}";
+                    ResultListView.ItemsSource = new List<string> { "Linear regression performed." }; // Or any relevant steps if you implement them
                 }
                 catch (Exception ex)
                 {
@@ -297,6 +410,8 @@ namespace LVS_Gauss_Busters
 
                     double[] coefficients = EquationSolver.PolynomialRegression(x, y, degree);
                     FinalRootText.Text = "y = " + string.Join(" + ", coefficients.Select((c, i) => $"{c:F4}x^{i}"));
+                    ResultListView.ItemsSource = new List<string> { "Polynomial regression performed." }; // Or any relevant steps
+
                 }
                 catch (Exception ex)
                 {

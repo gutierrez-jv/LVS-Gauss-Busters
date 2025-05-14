@@ -48,13 +48,13 @@
                     <TextBlock Text="Equation (in terms of x):" Foreground="White"/>
                     <TextBox x:Name="EquationInput" PlaceholderText="e.g., x^2 - 2" Background="#2D2D2D" Foreground="White"/>
                 </StackPanel>
-                <StackPanel x:Name="InitialGuessXbPanel">
-                    <TextBlock Text="Second Guess (xb):" Foreground="White"/>
-                    <TextBox x:Name="X1Input" PlaceholderText="e.g., 2" Background="#2D2D2D" Foreground="White"/>
-                </StackPanel>
                 <StackPanel x:Name="InitialGuessXaPanel">
                     <TextBlock Text="Initial Guess (xa):" Foreground="White"/>
                     <TextBox x:Name="X0Input" PlaceholderText="e.g., 1" Background="#2D2D2D" Foreground="White"/>
+                </StackPanel>
+                <StackPanel x:Name="InitialGuessXbPanel">
+                    <TextBlock Text="Second Guess (xb):" Foreground="White"/>
+                    <TextBox x:Name="X1Input" PlaceholderText="e.g., 2" Background="#2D2D2D" Foreground="White"/>
                 </StackPanel>
                 <TextBlock x:Name="InitialGuessesLabel" Text="Initial Guesses:" Foreground="White"/>
                 <StackPanel x:Name="InitialGuessesInputPanel" Orientation="Vertical" />
