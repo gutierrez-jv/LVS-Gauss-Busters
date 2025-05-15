@@ -20,7 +20,6 @@ namespace LVS_Gauss_Busters
         private List<TextBox> equationInputFields = new();
         private List<TextBox> initialGuessInputFields = new();
         private StackPanel PointInputPanelField;
-        private TextBlock SolutionTextBlockField;
         private WinUIPlot PlotViewField;
         internal ComboBox PointCountSelectorField;
 
@@ -32,7 +31,6 @@ namespace LVS_Gauss_Busters
         public MainWindow()
         {
             this.InitializeComponent();
-            SolutionTextBlockField = (TextBlock)((FrameworkElement)this.Content).FindName("SolutionTextBlock");
             PointCountSelectorField = (ComboBox)((FrameworkElement)this.Content).FindName("PointCountSelector");
             PointInputPanelField = (StackPanel)((FrameworkElement)this.Content).FindName("PointInputPanel");
             PlotViewControl = (WinUIPlot)((FrameworkElement)this.Content).FindName("PlotView"); // Use PlotViewControl here
@@ -62,6 +60,10 @@ namespace LVS_Gauss_Busters
                 LinearRegressionData.Visibility = Visibility.Collapsed;
                 PointCountSelector.Visibility = Visibility.Collapsed;
                 PointInputPanel.Visibility = Visibility.Collapsed;
+                PlotStack.Visibility = Visibility.Collapsed;
+                PlotView.Visibility = Visibility.Collapsed;
+                ResultListView.ItemsSource = null;
+                FinalRootText.Text = "";
             }
             else if (selectedMethod == "Newton-Raphson")
             {
@@ -79,6 +81,10 @@ namespace LVS_Gauss_Busters
                 LinearRegressionData.Visibility = Visibility.Collapsed;
                 PointCountSelector.Visibility = Visibility.Collapsed;
                 PointInputPanel.Visibility = Visibility.Collapsed;
+                PlotStack.Visibility = Visibility.Collapsed;
+                PlotView.Visibility = Visibility.Collapsed;
+                ResultListView.ItemsSource = null;
+                FinalRootText.Text = "";
             }
             else if (selectedMethod == "Gaussian Elimination")
             {
@@ -87,6 +93,7 @@ namespace LVS_Gauss_Busters
                 InitialGuessXbPanel.Visibility = Visibility.Collapsed;
                 NumberOfEquationsPanel.Visibility = Visibility.Visible;
                 InitialGuessesInputPanel.Visibility = Visibility.Collapsed;
+                InitialGuessesLabel.Visibility = Visibility.Visible;
                 EquationsLabel.Visibility = Visibility.Visible;
                 EquationsInputPanel.Visibility = Visibility.Visible;
                 RegressionInputPanel.Visibility = Visibility.Collapsed;
@@ -95,6 +102,10 @@ namespace LVS_Gauss_Busters
                 LinearRegressionData.Visibility = Visibility.Collapsed;
                 PointCountSelector.Visibility = Visibility.Collapsed;
                 PointInputPanel.Visibility = Visibility.Collapsed;
+                PlotStack.Visibility = Visibility.Collapsed;
+                PlotView.Visibility = Visibility.Collapsed;
+                ResultListView.ItemsSource = null;
+                FinalRootText.Text = "";
             }
             else if (selectedMethod == "Gauss-Jordan")
             {
@@ -103,6 +114,7 @@ namespace LVS_Gauss_Busters
                 InitialGuessXbPanel.Visibility = Visibility.Collapsed;
                 NumberOfEquationsPanel.Visibility = Visibility.Visible;
                 InitialGuessesInputPanel.Visibility = Visibility.Collapsed;
+                InitialGuessesLabel.Visibility = Visibility.Collapsed;
                 EquationsLabel.Visibility = Visibility.Visible;
                 EquationsInputPanel.Visibility = Visibility.Visible;
                 RegressionInputPanel.Visibility = Visibility.Collapsed;
@@ -111,6 +123,10 @@ namespace LVS_Gauss_Busters
                 LinearRegressionData.Visibility = Visibility.Collapsed;
                 PointCountSelector.Visibility = Visibility.Collapsed;
                 PointInputPanel.Visibility = Visibility.Collapsed;
+                PlotStack.Visibility = Visibility.Collapsed;
+                PlotView.Visibility = Visibility.Collapsed;
+                ResultListView.ItemsSource = null;
+                FinalRootText.Text = "";
             }
             else if (selectedMethod == "Gauss-Seidel")
             {
@@ -119,6 +135,7 @@ namespace LVS_Gauss_Busters
                 InitialGuessXbPanel.Visibility = Visibility.Collapsed;
                 NumberOfEquationsPanel.Visibility = Visibility.Visible;
                 InitialGuessesInputPanel.Visibility = Visibility.Visible;
+                InitialGuessesLabel.Visibility = Visibility.Visible;
                 EquationsLabel.Visibility = Visibility.Visible;
                 EquationsInputPanel.Visibility = Visibility.Visible;
                 NumberOfEquationsTextBox.Visibility = Visibility.Visible;
@@ -128,6 +145,10 @@ namespace LVS_Gauss_Busters
                 LinearRegressionData.Visibility = Visibility.Collapsed;
                 PointCountSelector.Visibility = Visibility.Collapsed;
                 PointInputPanel.Visibility = Visibility.Collapsed;
+                PlotStack.Visibility = Visibility.Collapsed;
+                PlotView.Visibility = Visibility.Collapsed;
+                ResultListView.ItemsSource = null;
+                FinalRootText.Text = "";
             }
             else if (selectedMethod == "Linear Regression")
             {
@@ -145,6 +166,10 @@ namespace LVS_Gauss_Busters
                 EquationsInputPanel.Visibility = Visibility.Collapsed;
                 PolynomialDegreeLabel.Visibility = Visibility.Collapsed;
                 PolynomialDegreeTextBox.Visibility = Visibility.Collapsed;
+                PlotStack.Visibility = Visibility.Visible;
+                PlotView.Visibility = Visibility.Collapsed;
+                ResultListView.ItemsSource = null;
+                FinalRootText.Text = "";
             }
             else if (selectedMethod == "Polynomial Regression")
             {
@@ -163,6 +188,10 @@ namespace LVS_Gauss_Busters
                 PolynomialDegreeLabel.Visibility = Visibility.Visible;
                 PolynomialDegreeTextBox.Visibility = Visibility.Visible;
                 RegressionInputPanel.Visibility = Visibility.Visible;
+                PlotStack.Visibility = Visibility.Visible;
+                PlotView.Visibility = Visibility.Collapsed;
+                ResultListView.ItemsSource = null;
+                FinalRootText.Text = "";
             }
         }
 
@@ -238,8 +267,6 @@ namespace LVS_Gauss_Busters
                 // Optionally show an error message to the user
             }
         }
-
-        
 
         private async void SolveButton_Click(object sender, RoutedEventArgs e)
         {
@@ -523,7 +550,6 @@ namespace LVS_Gauss_Busters
             }
         }
 
-
         private int GetPolynomialDegree()
         {
             if (string.IsNullOrWhiteSpace(PolynomialDegreeTextBox.Text))
@@ -598,7 +624,17 @@ namespace LVS_Gauss_Busters
                 solutionBuilder.AppendLine($"Final Linear Regression Equation: y = {slope:F4}x + {intercept:F4}");
 
                 // Display the solution
-                SolutionTextBlock.Text = solutionBuilder.ToString();
+                // Display the solution in both TextBlock and ListView
+                string[] solutionLines = solutionBuilder.ToString().Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+
+
+                // Clear previous items and update ResultListView
+                ResultListView.Items.Clear();
+                foreach (var solutionLine in solutionLines)
+                {
+                    if (!string.IsNullOrWhiteSpace(solutionLine))
+                        ResultListView.Items.Add(solutionLine);
+                }
 
                 // Plot the data
                 var plt = PlotView.Plot;
@@ -619,6 +655,7 @@ namespace LVS_Gauss_Busters
                 line.Label = "Regression Line";
 
                 plt.Legend.IsVisible = true;
+                PlotView.Visibility = Visibility.Visible;
                 PlotView.Refresh();
             }
             catch (Exception ex)

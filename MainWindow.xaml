@@ -59,8 +59,8 @@
                         <TextBlock Text="Second Guess (xb):" Foreground="White"/>
                         <TextBox x:Name="X1Input" PlaceholderText="e.g., 2" Background="#2D2D2D" Foreground="White"/>
                     </StackPanel>
-                    <StackPanel x:Name="InitialGuessesInputPanel" Orientation="Vertical" Visibility="Collapsed"/>
                     <TextBlock x:Name="InitialGuessesLabel" Text="Initial Guesses:" Foreground="White" Visibility="Collapsed"/>
+                    <StackPanel x:Name="InitialGuessesInputPanel" Orientation="Vertical" Visibility="Collapsed"/>
                     <TextBlock x:Name="EquationsLabel" Text="Equations:" Foreground="White" Visibility="Collapsed"/>
                     <StackPanel x:Name="EquationsInputPanel" Orientation="Vertical" Visibility="Collapsed"/>
 
@@ -101,8 +101,7 @@
                 <!-- Output Panel -->
                 <StackPanel Grid.Column="1" Padding="20" Background="#1A1A1A" CornerRadius="15" Spacing="10" Margin="10,0,0,0">
                     <!-- Solution Steps Header -->
-                    <TextBlock Text="Solution Steps" FontSize="26" FontWeight="Bold" FontFamily="Rockwell"
-                               Foreground="White" Margin="0 0 0 10"/>
+                    <TextBlock Text="Solution Steps" FontSize="26" FontWeight="Bold" FontFamily="Rockwell" Foreground="White" Margin="0 0 0 10"/>
 
                     <!-- Solution Steps List -->
                     <ScrollViewer VerticalScrollBarVisibility="Auto" Height="350">
@@ -116,20 +115,17 @@
                     </ScrollViewer>
 
                     <!-- Solution Text -->
-                    <ScrollViewer VerticalScrollBarVisibility="Auto" Height="200" Margin="0,10,0,0">
-                        <TextBlock x:Name="SolutionTextBlock" Foreground="White" FontFamily="Consolas" TextWrapping="Wrap"/>
-                    </ScrollViewer>
 
                     <!-- Final Root Text -->
                     <TextBlock x:Name="FinalRootText" Foreground="#7CFC00" FontSize="16" FontFamily="Rockwell"
                                FontWeight="Bold" Margin="0,10,0,0" TextWrapping="Wrap"/>
 
                     <!-- Plot Header -->
-                    <TextBlock Text="Plot" FontSize="26" FontWeight="Bold" FontFamily="Rockwell"
-                               Foreground="White" Margin="0 20 0 10"/>
-
-                    <!-- Plot View -->
-                    <scottplot:WinUIPlot x:Name="PlotView" Height="300" Background="#2D2D2D"/>
+                    <StackPanel x:Name="PlotStack" Visibility="Collapsed">
+                        <TextBlock Text="Plot" FontSize="26" FontWeight="Bold" FontFamily="Rockwell" Foreground="White" Margin="0 20 0 10"/>
+                        <scottplot:WinUIPlot x:Name="PlotView" Height="300" Background="#2D2D2D" Visibility="Collapsed"/>
+                    </StackPanel>
+                    
                 </StackPanel>
             </Grid>
         </Grid>
