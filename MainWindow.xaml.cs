@@ -42,6 +42,7 @@ namespace LVS_Gauss_Busters
 
         private void MethodSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+
             var selectedMethod = (MethodSelector.SelectedItem as ComboBoxItem)?.Content.ToString();
 
             if (selectedMethod == "Bisection" || selectedMethod == "Secant")
@@ -171,6 +172,7 @@ namespace LVS_Gauss_Busters
                 ResultListView.ItemsSource = null;
                 FinalRootText.Text = "";
             }
+
             else if (selectedMethod == "Polynomial Regression")
             {
                 SingleEquationPanel.Visibility = Visibility.Collapsed;
@@ -539,17 +541,137 @@ namespace LVS_Gauss_Busters
 
                     int degree = GetPolynomialDegree();
 
-                    double[] coefficients = EquationSolver.PolynomialRegression(xValues.ToArray(), yValues.ToArray(), degree);
-                    FinalRootText.Text = "y = " + string.Join(" + ", coefficients.Select((c, i) => $"{c:F4}x^{i}"));
-                    ResultListView.ItemsSource = new List<string> { "Polynomial regression performed." };
+                    List<string> steps = new List<string>();
+                    double[] coefficients = EquationSolver.PolynomialRegression(xValues.ToArray(), yValues.ToArray(), degree, steps);
+
+                    // Format the polynomial equation for FinalRootText
+                    FinalRootText.Text = "y = ";
+                    for (int i = 0; i < coefficients.Length; i++)
+                    {
+                        string term;
+                        if (i == 0)
+                        {
+                            term = $"{coefficients[i]:F4}";
+                        }
+                        else if (i == 1)
+                        {
+                            term = $"{coefficients[i]:F4}x";
+                        }
+                        else
+                        {
+                            term = $"{coefficients[i]:F4}x^{i}";
+                        }
+
+                        if (i > 0)
+                        {
+                            if (coefficients[i] >= 0)
+                            {
+                                FinalRootText.Text += " + ";
+                            }
+                            else
+                            {
+                                FinalRootText.Text += " ";
+                            }
+                        }
+                        FinalRootText.Text += term;
+                    }
+
+                    // Format the coefficients for ResultListView
+                    var coefficientList = new List<string>();
+                    coefficientList.Add($"Polynomial Degree: {degree}");
+                    for (int i = 0; i < coefficients.Length; i++)
+                    {
+                        coefficientList.Add($"Coefficient of x^{i}: {coefficients[i]:F4}");
+                    }
+                    ResultListView.ItemsSource = steps;
+
+                    // Call the plotting function
+                    PlotPolynomialRegression(xValues.ToArray(), yValues.ToArray(), coefficients);
                 }
                 catch (Exception ex)
                 {
                     FinalRootText.Text = $"Error: {ex.Message}";
+                    ResultListView.ItemsSource = new List<string> { $"Error: {ex.Message}" };
+                    PlotView.Plot.Clear(); // Clear any previous plot
+                    PlotView.Visibility = Visibility.Collapsed; // Hide plot on error
                 }
             }
         }
 
+        private void PlotPolynomialRegression(double[] xValues, double[] yValues, double[] coefficients)
+        {
+            if (xValues == null || yValues == null || coefficients == null || xValues.Length != yValues.Length || xValues.Length < 2)
+            {
+                // Handle cases with insufficient or invalid data for plotting
+                PlotView.Plot.Clear();
+                PlotView.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            var plt = PlotView.Plot;
+            plt.Clear();
+
+            // --- Styling the Plot (You already have this in your Linear Regression, let's reuse/adapt) ---
+            PlotView.Plot.FigureBackground.Color = Color.FromHex("#1a1a1a");
+            PlotView.Plot.DataBackground.Color = Color.FromHex("#1a1a1a");
+            PlotView.Plot.Axes.Color(Color.FromHex("#d7d7d7"));
+            PlotView.Plot.Grid.MajorLineColor = Color.FromHex("#3a3a3a");
+            PlotView.Plot.Legend.BackgroundColor = Color.FromHex("#3a3a3a");
+            PlotView.Plot.Legend.FontColor = Color.FromHex("#e10600");
+            PlotView.Plot.Legend.OutlineColor = Color.FromHex("#e10600");
+
+            // Plot the original data points
+            var scatter = plt.Add.Scatter(xValues, yValues);
+            scatter.Label = "Data Points";
+            scatter.Color = ScottPlot.Color.FromSDColor(System.Drawing.Color.White);
+
+            // Generate points for the polynomial curve
+            double minX = xValues.Min();
+            double maxX = xValues.Max();
+            double[] xCurve = LinSpace(minX, maxX, 100); // Generate 100 points for a smooth curve
+            double[] yCurve = EvaluatePolynomial(xCurve, coefficients);
+
+            // Plot the polynomial curve
+            var line = plt.Add.Scatter(xCurve, yCurve);
+            line.LineColor = ScottPlot.Color.FromHex("#e10600");
+            line.Label = $"Polynomial (Degree {coefficients.Length - 1})";
+
+            plt.Legend.IsVisible = true;
+            PlotView.Visibility = Visibility.Visible;
+            PlotView.Refresh();
+        }
+
+        // Helper function to evaluate the polynomial
+        private double[] EvaluatePolynomial(double[] x, double[] coefficients)
+        {
+            double[] y = new double[x.Length];
+            for (int i = 0; i < x.Length; i++)
+            {
+                y[i] = 0;
+                for (int j = 0; j < coefficients.Length; j++)
+                {
+                    y[i] += coefficients[j] * Math.Pow(x[i], j);
+                }
+            }
+            return y;
+        }
+
+        // Helper function for creating a linear space of numbers
+        private double[] LinSpace(double start, double end, int count)
+        {
+            double[] result = new double[count];
+            if (count < 2)
+            {
+                if (count == 1) result[0] = start;
+                return result;
+            }
+            double step = (end - start) / (count - 1);
+            for (int i = 0; i < count; i++)
+            {
+                result[i] = start + i * step;
+            }
+            return result;
+        }
         private int GetPolynomialDegree()
         {
             if (string.IsNullOrWhiteSpace(PolynomialDegreeTextBox.Text))
@@ -626,7 +748,25 @@ namespace LVS_Gauss_Busters
                 // Display the solution
                 // Display the solution in both TextBlock and ListView
                 string[] solutionLines = solutionBuilder.ToString().Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+                string finalEquation = "y = ";
+                if (slope >= 0)
+                {
+                    finalEquation += $"{slope:F4}x";
+                }
+                else
+                {
+                    finalEquation += $"{slope:F4}x"; // Negative sign is included
+                }
 
+                if (intercept >= 0)
+                {
+                    finalEquation += $" + {intercept:F4}";
+                }
+                else
+                {
+                    finalEquation += $" {intercept:F4}"; // Negative sign is included
+                }
+                FinalRootText.Text = finalEquation;
 
                 // Clear previous items and update ResultListView
                 ResultListView.Items.Clear();

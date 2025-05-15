@@ -530,53 +530,198 @@ namespace LVS_Gauss_Busters
             return (slope, intercept);
         }
 
-        public static double[] PolynomialRegression(double[] x, double[] y, int degree)
+        public static double[] PolynomialRegression(double[] x, double[] y, int degree, List<string> steps)
         {
-            if (x.Length != y.Length)
-                throw new ArgumentException("Input arrays must have the same length.");
-            if (x.Length <= degree)
-                throw new ArgumentException("Number of data points must be greater than the polynomial degree.");
+            if (x == null || y == null || x.Length != y.Length || x.Length <= degree)
+            {
+                throw new ArgumentException($"At least {degree + 1} data points are required for a polynomial of degree {degree}.");
+            }
 
             int n = x.Length;
-            int m = degree + 1;
+            double[,] vandermondeMatrix = new double[n, degree + 1];
+            double[,] transposeMatrix = new double[degree + 1, n];
+            double[,] ataMatrix = new double[degree + 1, degree + 1];
+            double[] atyVector = new double[degree + 1];
 
-            // Step 1: Construct Vandermonde matrix A
-            double[,] A = new double[n, m];
+            // Step 1: Construct the Vandermonde Matrix A
+            steps.Add($"Polynomial Regression (Degree {degree})");
+            steps.Add("------------------------------------------------------");
+            steps.Add("Construct the Vandermonde Matrix A");
             for (int i = 0; i < n; i++)
             {
-                for (int j = 0; j < m; j++)
+                for (int j = 0; j <= degree; j++)
                 {
-                    A[i, j] = Math.Pow(x[i], j);
+                    vandermondeMatrix[i, j] = Math.Pow(x[i], j);
+                }
+            }
+            steps.Add($"A =\n{FormatMatrix(vandermondeMatrix)}");
+
+            // Step 2: Calculate A^T (Transpose of A)
+            for (int i = 0; i <= degree; i++)
+            {
+                for (int j = 0; j < n; j++)
+                {
+                    transposeMatrix[i, j] = vandermondeMatrix[j, i];
                 }
             }
 
-            // Step 2: Create y vector
-            double[] yVec = y.ToArray(); // copy of y
-
-            // Step 3: Compute AᵀA and Aᵀy
-            double[,] AtA = new double[m, m];
-            double[] Aty = new double[m];
-
-            for (int i = 0; i < m; i++)
+            // Step 3: Calculate A^T * A
+            for (int i = 0; i <= degree; i++)
             {
-                for (int j = 0; j < m; j++)
+                for (int j = 0; j <= degree; j++)
                 {
-                    AtA[i, j] = 0;
+                    ataMatrix[i, j] = 0;
                     for (int k = 0; k < n; k++)
                     {
-                        AtA[i, j] += A[k, i] * A[k, j];
+                        ataMatrix[i, j] += transposeMatrix[i, k] * vandermondeMatrix[k, j];
+                    }
+                }
+            }
+            steps.Add("------------------------------------------------------");
+            steps.Add("Calculate A^T * A (A Transpose times A)");
+            steps.Add($"A^T * A =\n{FormatMatrix(ataMatrix)}");
+
+            // Step 4: Calculate A^T * y
+            for (int i = 0; i <= degree; i++)
+            {
+                atyVector[i] = 0;
+                for (int j = 0; j < n; j++)
+                {
+                    atyVector[i] += transposeMatrix[i, j] * y[j];
+                }
+            }
+            steps.Add("------------------------------------------------------");
+            steps.Add("Calculate A^T * y (A Transpose times y)");
+            steps.Add($"A^T * y = [{string.Join(", ", atyVector.Select(v => v.ToString("F4")))}]");
+
+            // Step 5: Solve for coefficients using Gaussian Elimination
+            double[,] augmentedMatrix = new double[degree + 1, degree + 2];
+            for (int i = 0; i <= degree; i++)
+            {
+                for (int j = 0; j <= degree; j++)
+                {
+                    augmentedMatrix[i, j] = ataMatrix[i, j];
+                }
+                augmentedMatrix[i, degree + 1] = atyVector[i];
+            }
+
+            steps.Add("------------------------------------------------------");
+            steps.Add("Solve for Coefficients using Gaussian Elimination");
+            double[] coefficients = GaussianEliminationForPolynomial(augmentedMatrix, steps);
+
+            steps.Add("Coefficients:");
+            for (int i = 0; i < coefficients.Length; i++)
+            {
+                steps.Add($"c[{i}] = {coefficients[i]:F4}");
+            }
+
+            // Step 6: Final Polynomial Regression Equation
+            steps.Add("------------------------------------------------------");
+            steps.Add("Final Polynomial Regression Equation:");
+            string equation = "y = ";
+            for (int i = 0; i < coefficients.Length; i++)
+            {
+                string term;
+                if (i == 0)
+                {
+                    term = $"{coefficients[i]:F4}";
+                }
+                else if (i == 1)
+                {
+                    term = $"{coefficients[i]:F4}x";
+                }
+                else
+                {
+                    term = $"{coefficients[i]:F4}x^{i}";
+                }
+
+                if (i > 0)
+                {
+                    if (coefficients[i] >= 0)
+                    {
+                        equation += " + ";
+                    }
+                    else
+                    {
+                        equation += " "; // Keep the negative sign
+                    }
+                }
+                equation += term;
+            }
+            steps.Add(equation);
+
+            // Print all steps
+            foreach (var step in steps)
+            {
+                Console.WriteLine(step);
+            }
+
+            return coefficients;
+        }
+
+
+        // Modified Gaussian Elimination for Polynomial Regression (returns coefficients)
+        private static double[] GaussianEliminationForPolynomial(double[,] augmentedMatrix, List<string> steps)
+        {
+            int n = augmentedMatrix.GetLength(0);
+            double[] coefficients = new double[n];
+
+            for (int i = 0; i < n; i++)
+            {
+                // Find pivot row
+                int pivotRow = i;
+                for (int j = i + 1; j < n; j++)
+                {
+                    if (Math.Abs(augmentedMatrix[j, i]) > Math.Abs(augmentedMatrix[pivotRow, i]))
+                    {
+                        pivotRow = j;
                     }
                 }
 
-                Aty[i] = 0;
-                for (int k = 0; k < n; k++)
+                // Swap rows
+                if (pivotRow != i)
                 {
-                    Aty[i] += A[k, i] * yVec[k];
+                    for (int k = 0; k <= n; k++)
+                    {
+                        (augmentedMatrix[i, k], augmentedMatrix[pivotRow, k]) = (augmentedMatrix[pivotRow, k], augmentedMatrix[i, k]);
+                    }
+                    steps.Add($"Swapped R{i + 1} with R{pivotRow + 1}");
+                }
+
+                // Make the pivot element 1
+                double pivot = augmentedMatrix[i, i];
+                if (Math.Abs(pivot) < 1e-9)
+                {
+                    throw new ArithmeticException("System has no unique solution or is singular.");
+                }
+                for (int j = i; j <= n; j++)
+                {
+                    augmentedMatrix[i, j] /= pivot;
+                }
+                steps.Add($"R{i + 1} = R{i + 1} / {pivot:F4}");
+
+                // Eliminate other rows
+                for (int j = 0; j < n; j++)
+                {
+                    if (i != j)
+                    {
+                        double factor = augmentedMatrix[j, i];
+                        for (int k = i; k <= n; k++)
+                        {
+                            augmentedMatrix[j, k] -= factor * augmentedMatrix[i, k];
+                        }
+                        steps.Add($"R{j + 1} = R{j + 1} - ({factor:F4}) * R{i + 1}");
+                    }
                 }
             }
 
-            // Step 4: Solve the system (AtA * c = Aty)
-            return GaussianElimination(AtA, Aty);
+            // Extract coefficients (solution)
+            for (int i = 0; i < n; i++)
+            {
+                coefficients[i] = augmentedMatrix[i, n];
+            }
+
+            return coefficients;
         }
     }
 }
