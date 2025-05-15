@@ -534,22 +534,49 @@ namespace LVS_Gauss_Busters
         {
             if (x.Length != y.Length)
                 throw new ArgumentException("Input arrays must have the same length.");
+            if (x.Length <= degree)
+                throw new ArgumentException("Number of data points must be greater than the polynomial degree.");
 
             int n = x.Length;
-            var vandermondeMatrix = new double[n, degree + 1];
-            var rhs = new double[n];
+            int m = degree + 1;
 
+            // Step 1: Construct Vandermonde matrix A
+            double[,] A = new double[n, m];
             for (int i = 0; i < n; i++)
             {
-                for (int j = 0; j <= degree; j++)
+                for (int j = 0; j < m; j++)
                 {
-                    vandermondeMatrix[i, j] = Math.Pow(x[i], j);
+                    A[i, j] = Math.Pow(x[i], j);
                 }
-                rhs[i] = y[i];
             }
 
-            // Solve using Gaussian Elimination
-            return GaussianElimination(vandermondeMatrix, rhs);
+            // Step 2: Create y vector
+            double[] yVec = y.ToArray(); // copy of y
+
+            // Step 3: Compute AᵀA and Aᵀy
+            double[,] AtA = new double[m, m];
+            double[] Aty = new double[m];
+
+            for (int i = 0; i < m; i++)
+            {
+                for (int j = 0; j < m; j++)
+                {
+                    AtA[i, j] = 0;
+                    for (int k = 0; k < n; k++)
+                    {
+                        AtA[i, j] += A[k, i] * A[k, j];
+                    }
+                }
+
+                Aty[i] = 0;
+                for (int k = 0; k < n; k++)
+                {
+                    Aty[i] += A[k, i] * yVec[k];
+                }
+            }
+
+            // Step 4: Solve the system (AtA * c = Aty)
+            return GaussianElimination(AtA, Aty);
         }
     }
 }

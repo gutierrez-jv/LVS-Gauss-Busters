@@ -1,9 +1,16 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Markup;
+using Microsoft.UI.Xaml.Controls.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using LVS_Gauss_Busters.Models;
+using ScottPlot;
+using ScottPlot.WinUI;
+using System.Threading.Tasks;
 
 namespace LVS_Gauss_Busters
 {
@@ -12,14 +19,29 @@ namespace LVS_Gauss_Busters
         private int numberOfEquations = 3; // Default value
         private List<TextBox> equationInputFields = new();
         private List<TextBox> initialGuessInputFields = new();
+        private StackPanel PointInputPanelField;
+        private TextBlock SolutionTextBlockField;
+        private WinUIPlot PlotViewField;
+        internal ComboBox PointCountSelectorField;
 
+        public WinUIPlot PlotViewControl
+        {
+            get => PlotViewField;
+            private set => PlotViewField = value;
+        }
         public MainWindow()
         {
             this.InitializeComponent();
+            SolutionTextBlockField = (TextBlock)((FrameworkElement)this.Content).FindName("SolutionTextBlock");
+            PointCountSelectorField = (ComboBox)((FrameworkElement)this.Content).FindName("PointCountSelector");
+            PointInputPanelField = (StackPanel)((FrameworkElement)this.Content).FindName("PointInputPanel");
+            PlotViewControl = (WinUIPlot)((FrameworkElement)this.Content).FindName("PlotView"); // Use PlotViewControl here
             UpdateInputVisibility();
             GenerateEquationInputFields();
             GenerateInitialGuessInputFields();
         }
+
+        private TextBlock NumberOfPointsLabel;
 
         private void UpdateInputVisibility()
         {
@@ -55,6 +77,9 @@ namespace LVS_Gauss_Busters
                                                 polyItem.Content?.ToString() == "Polynomial Regression"
                                                 ? Visibility.Visible : Visibility.Collapsed;
             PolynomialDegreeTextBox.Visibility = PolynomialDegreeLabel.Visibility;
+
+            // Ensure only the dropdown for number of points is visible for regression methods
+            PointCountSelectorField.Visibility = isRegression ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void GenerateEquationInputFields()
@@ -63,24 +88,31 @@ namespace LVS_Gauss_Busters
             equationInputFields.Clear();
             for (int i = 0; i < numberOfEquations; i++)
             {
-                var equationPanel = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 5 };
+                var equationPanel = new Microsoft.UI.Xaml.Controls.StackPanel { Orientation = Microsoft.UI.Xaml.Controls.Orientation.Horizontal, Spacing = 5 };
                 for (int j = 0; j < numberOfEquations; j++)
                 {
                     equationPanel.Children.Add(new TextBox
                     {
                         Width = 60,
                         PlaceholderText = $"a{i + 1}{GetVariableLetter(j)}",
-                        Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.DimGray),
-                        Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.White)
+                        Background = new SolidColorBrush(Microsoft.UI.Colors.DimGray),
+                        Foreground = new SolidColorBrush(Microsoft.UI.Colors.White),
+                        VerticalAlignment = Microsoft.UI.Xaml.VerticalAlignment.Center // Fully qualify VerticalAlignment
                     });
                 }
-                equationPanel.Children.Add(new TextBlock { Text = "=", Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.White), VerticalAlignment = VerticalAlignment.Center });
+                equationPanel.Children.Add(new TextBlock
+                {
+                    Text = "=",
+                    Foreground = new SolidColorBrush(Microsoft.UI.Colors.White),
+                    VerticalAlignment = Microsoft.UI.Xaml.VerticalAlignment.Center // Fully qualify VerticalAlignment
+                });
                 equationPanel.Children.Add(new TextBox
                 {
                     Width = 60,
                     PlaceholderText = $"b{i + 1}",
-                    Background = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.DimGray),
-                    Foreground = new Microsoft.UI.Xaml.Media.SolidColorBrush(Microsoft.UI.Colors.White)
+                    Background = new SolidColorBrush(Microsoft.UI.Colors.DimGray),
+                    Foreground = new SolidColorBrush(Microsoft.UI.Colors.White),
+                    VerticalAlignment = Microsoft.UI.Xaml.VerticalAlignment.Center // Fully qualify VerticalAlignment
                 });
                 EquationsInputPanel.Children.Add(equationPanel);
                 equationInputFields.AddRange(equationPanel.Children.OfType<TextBox>());
@@ -386,19 +418,7 @@ namespace LVS_Gauss_Busters
             }
             else if (method == "Linear Regression")
             {
-                try
-                {
-                    double[] x = InputXValues(); // Implement a method to read X values
-                    double[] y = InputYValues(); // Implement a method to read Y values
-
-                    var (slope, intercept) = EquationSolver.LinearRegression(x, y);
-                    FinalRootText.Text = $"y = {slope:F4}x + {intercept:F4}";
-                    ResultListView.ItemsSource = new List<string> { "Linear regression performed." }; // Or any relevant steps if you implement them
-                }
-                catch (Exception ex)
-                {
-                    FinalRootText.Text = $"Error: {ex.Message}";
-                }
+                await SolveButton_Click_LinearRegression(sender, e);
             }
             else if (method == "Polynomial Regression")
             {
@@ -451,6 +471,98 @@ namespace LVS_Gauss_Busters
                 throw new ArgumentException("Polynomial degree must be a non-negative integer.");
 
             return degree;
+        }
+
+        private void PointCountSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (PointCountSelector.SelectedItem is ComboBoxItem selectedItem)
+            {
+                int pointCount = int.Parse(selectedItem.Content.ToString());
+                PointInputPanel.Children.Clear();
+
+                for (int i = 1; i <= pointCount; i++)
+                {
+                    var stackPanel = new StackPanel { Orientation = Microsoft.UI.Xaml.Controls.Orientation.Horizontal, Margin = new Thickness(0, 5, 0, 0) };
+                    stackPanel.Children.Add(new TextBlock { Text = $"Point {i}:", Foreground = new SolidColorBrush(Microsoft.UI.Colors.White), Width = 60 });
+                    stackPanel.Children.Add(new TextBox { Name = $"X{i}", Width = 50, Margin = new Thickness(5, 0, 5, 0) });
+                    stackPanel.Children.Add(new TextBox { Name = $"Y{i}", Width = 50 });
+                    PointInputPanel.Children.Add(stackPanel);
+                }
+            }
+        }
+
+        private async Task SolveButton_Click_LinearRegression(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var xValues = PointInputPanel.Children.OfType<StackPanel>()
+                    .Select(sp => double.Parse(((TextBox)sp.Children[1]).Text)).ToArray();
+                var yValues = PointInputPanel.Children.OfType<StackPanel>()
+                    .Select(sp => double.Parse(((TextBox)sp.Children[2]).Text)).ToArray();
+
+                var (slope, intercept) = EquationSolver.LinearRegression(xValues, yValues);
+
+                // Construct the solution text
+                var solutionBuilder = new System.Text.StringBuilder();
+                solutionBuilder.AppendLine("=== Construct Table of Values ===");
+                solutionBuilder.AppendLine($"{"x",10} {"y",10} {"x*y",10} {"x^2",10}");
+                double sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+
+                for (int i = 0; i < xValues.Length; i++)
+                {
+                    double x = xValues[i];
+                    double y = yValues[i];
+                    double xy = x * y;
+                    double x2 = x * x;
+
+                    sumX += x;
+                    sumY += y;
+                    sumXY += xy;
+                    sumX2 += x2;
+
+                    solutionBuilder.AppendLine($"{x,10:F4} {y,10:F4} {xy,10:F4} {x2,10:F4}");
+                }
+
+                solutionBuilder.AppendLine();
+                solutionBuilder.AppendLine("=== Calculate Summations ===");
+                solutionBuilder.AppendLine($"?x = {sumX:F4}, ?y = {sumY:F4}, ?xy = {sumXY:F4}, ?x² = {sumX2:F4}");
+                solutionBuilder.AppendLine();
+                solutionBuilder.AppendLine("=== Compute the Slope (m) and Intercept (b) ===");
+                solutionBuilder.AppendLine($"m = (n?xy - ?x?y) / (n?x² - (?x)²)");
+                solutionBuilder.AppendLine($"m = ({xValues.Length} * {sumXY:F4} - {sumX:F4} * {sumY:F4}) / ({xValues.Length} * {sumX2:F4} - {sumX:F4}²) = {slope:F4}");
+                solutionBuilder.AppendLine($"b = (?y - m?x) / n");
+                solutionBuilder.AppendLine($"b = ({sumY:F4} - {slope:F4} * {sumX:F4}) / {xValues.Length} = {intercept:F4}");
+                solutionBuilder.AppendLine();
+                solutionBuilder.AppendLine($"Final Linear Regression Equation: y = {slope:F4}x + {intercept:F4}");
+
+                // Display the solution
+                SolutionTextBlock.Text = solutionBuilder.ToString();
+
+                // Plot the data
+                var plt = PlotView.Plot;
+                plt.Clear();
+                var scatter = plt.Add.Scatter(xValues, yValues);
+                scatter.Label = "Points";
+                scatter.Color = ScottPlot.Color.FromSDColor(System.Drawing.Color.Red);
+
+                var line = plt.Add.Function(x => slope * x + intercept);
+                line.LineColor = ScottPlot.Color.FromSDColor(System.Drawing.Color.Blue);
+                line.Label = "Regression Line";
+
+                plt.Legend.IsVisible = true;
+                PlotView.Refresh();
+            }
+            catch (Exception ex)
+            {
+                ContentDialog errorDialog = new ContentDialog
+                {
+                    Title = "Error",
+                    Content = $"Error: {ex.Message}",
+                    CloseButtonText = "OK",
+                    XamlRoot = this.Content.XamlRoot // Ensure the dialog is tied to the current window
+                };
+                await errorDialog.ShowAsync(); // Await is now valid because the method is async
+            }
         }
     }
 }
