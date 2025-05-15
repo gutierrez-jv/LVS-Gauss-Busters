@@ -36,50 +36,134 @@ namespace LVS_Gauss_Busters
             PointCountSelectorField = (ComboBox)((FrameworkElement)this.Content).FindName("PointCountSelector");
             PointInputPanelField = (StackPanel)((FrameworkElement)this.Content).FindName("PointInputPanel");
             PlotViewControl = (WinUIPlot)((FrameworkElement)this.Content).FindName("PlotView"); // Use PlotViewControl here
-            UpdateInputVisibility();
             GenerateEquationInputFields();
             GenerateInitialGuessInputFields();
         }
 
         private TextBlock NumberOfPointsLabel;
 
-        private void UpdateInputVisibility()
+        private void MethodSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            bool isLinearSolver = MethodSelector.SelectedItem is ComboBoxItem selectedItem &&
-                                  (selectedItem.Content?.ToString().Contains("Gaussian") == true ||
-                                   selectedItem.Content?.ToString().Contains("Gauss") == true);
+            var selectedMethod = (MethodSelector.SelectedItem as ComboBoxItem)?.Content.ToString();
 
-            NumberOfEquationsLabel.Visibility = isLinearSolver ? Visibility.Visible : Visibility.Collapsed;
-            NumberOfEquationsPanel.Visibility = isLinearSolver ? Visibility.Visible : Visibility.Collapsed;
-            EquationsLabel.Visibility = isLinearSolver ? Visibility.Visible : Visibility.Collapsed;
-            EquationsInputPanel.Visibility = isLinearSolver ? Visibility.Visible : Visibility.Collapsed;
-            InitialGuessesLabel.Visibility = (isLinearSolver && MethodSelector.SelectedItem is ComboBoxItem gsItem && gsItem.Content?.ToString() == "Gauss-Seidel") ? Visibility.Visible : Visibility.Collapsed;
-            InitialGuessesInputPanel.Visibility = (isLinearSolver && MethodSelector.SelectedItem is ComboBoxItem gsItem2 && gsItem2.Content?.ToString() == "Gauss-Seidel") ? Visibility.Visible : Visibility.Collapsed;
-
-            SingleEquationPanel.Visibility = !isLinearSolver ? Visibility.Visible : Visibility.Collapsed;
-            InitialGuessXaPanel.Visibility = !isLinearSolver ? Visibility.Visible : Visibility.Collapsed;
-            InitialGuessXbPanel.Visibility = !isLinearSolver ? Visibility.Visible : Visibility.Collapsed;
-
-            if (!isLinearSolver)
+            if (selectedMethod == "Bisection" || selectedMethod == "Secant")
             {
-                // Ensure single equation solver inputs are visible based on the selected method
-                string? method = ((ComboBoxItem?)MethodSelector.SelectedItem)?.Content?.ToString();
-                InitialGuessXbPanel.Visibility = (method == "Bisection" || method == "Secant") ? Visibility.Visible : Visibility.Collapsed;
+                SingleEquationPanel.Visibility = Visibility.Visible;
+                InitialGuessXaPanel.Visibility = Visibility.Visible;
+                InitialGuessXbPanel.Visibility = Visibility.Visible;
+                NumberOfEquationsPanel.Visibility = Visibility.Collapsed;
+                InitialGuessesInputPanel.Visibility = Visibility.Collapsed;
+                InitialGuessesLabel.Visibility = Visibility.Collapsed;
+                EquationsLabel.Visibility = Visibility.Collapsed;
+                EquationsInputPanel.Visibility = Visibility.Collapsed;
+                RegressionInputPanel.Visibility = Visibility.Collapsed;
+                PolynomialDegreeLabel.Visibility = Visibility.Collapsed;
+                PolynomialDegreeTextBox.Visibility = Visibility.Collapsed;
+                LinearRegressionData.Visibility = Visibility.Collapsed;
+                PointCountSelector.Visibility = Visibility.Collapsed;
+                PointInputPanel.Visibility = Visibility.Collapsed;
             }
-
-            // Show regression inputs for regression methods
-            bool isRegression = MethodSelector.SelectedItem is ComboBoxItem regressionItem &&
-                                (regressionItem.Content?.ToString() == "Linear Regression" ||
-                                 regressionItem.Content?.ToString() == "Polynomial Regression");
-
-            RegressionInputPanel.Visibility = isRegression ? Visibility.Visible : Visibility.Collapsed;
-            PolynomialDegreeLabel.Visibility = MethodSelector.SelectedItem is ComboBoxItem polyItem &&
-                                                polyItem.Content?.ToString() == "Polynomial Regression"
-                                                ? Visibility.Visible : Visibility.Collapsed;
-            PolynomialDegreeTextBox.Visibility = PolynomialDegreeLabel.Visibility;
-
-            // Ensure only the dropdown for number of points is visible for regression methods
-            PointCountSelectorField.Visibility = isRegression ? Visibility.Visible : Visibility.Collapsed;
+            else if (selectedMethod == "Newton-Raphson")
+            {
+                SingleEquationPanel.Visibility = Visibility.Visible;
+                InitialGuessXaPanel.Visibility = Visibility.Visible;
+                InitialGuessXbPanel.Visibility = Visibility.Collapsed;
+                NumberOfEquationsPanel.Visibility = Visibility.Collapsed;
+                InitialGuessesInputPanel.Visibility = Visibility.Collapsed;
+                InitialGuessesLabel.Visibility = Visibility.Collapsed;
+                EquationsLabel.Visibility = Visibility.Collapsed;
+                EquationsInputPanel.Visibility = Visibility.Collapsed;
+                RegressionInputPanel.Visibility = Visibility.Collapsed;
+                PolynomialDegreeLabel.Visibility = Visibility.Collapsed;
+                PolynomialDegreeTextBox.Visibility = Visibility.Collapsed;
+                LinearRegressionData.Visibility = Visibility.Collapsed;
+                PointCountSelector.Visibility = Visibility.Collapsed;
+                PointInputPanel.Visibility = Visibility.Collapsed;
+            }
+            else if (selectedMethod == "Gaussian Elimination")
+            {
+                SingleEquationPanel.Visibility = Visibility.Collapsed;
+                InitialGuessXaPanel.Visibility = Visibility.Collapsed;
+                InitialGuessXbPanel.Visibility = Visibility.Collapsed;
+                NumberOfEquationsPanel.Visibility = Visibility.Visible;
+                InitialGuessesInputPanel.Visibility = Visibility.Collapsed;
+                EquationsLabel.Visibility = Visibility.Visible;
+                EquationsInputPanel.Visibility = Visibility.Visible;
+                RegressionInputPanel.Visibility = Visibility.Collapsed;
+                PolynomialDegreeLabel.Visibility = Visibility.Collapsed;
+                PolynomialDegreeTextBox.Visibility = Visibility.Collapsed;
+                LinearRegressionData.Visibility = Visibility.Collapsed;
+                PointCountSelector.Visibility = Visibility.Collapsed;
+                PointInputPanel.Visibility = Visibility.Collapsed;
+            }
+            else if (selectedMethod == "Gauss-Jordan")
+            {
+                SingleEquationPanel.Visibility = Visibility.Collapsed;
+                InitialGuessXaPanel.Visibility = Visibility.Collapsed;
+                InitialGuessXbPanel.Visibility = Visibility.Collapsed;
+                NumberOfEquationsPanel.Visibility = Visibility.Visible;
+                InitialGuessesInputPanel.Visibility = Visibility.Collapsed;
+                EquationsLabel.Visibility = Visibility.Visible;
+                EquationsInputPanel.Visibility = Visibility.Visible;
+                RegressionInputPanel.Visibility = Visibility.Collapsed;
+                PolynomialDegreeLabel.Visibility = Visibility.Collapsed;
+                PolynomialDegreeTextBox.Visibility = Visibility.Collapsed;
+                LinearRegressionData.Visibility = Visibility.Collapsed;
+                PointCountSelector.Visibility = Visibility.Collapsed;
+                PointInputPanel.Visibility = Visibility.Collapsed;
+            }
+            else if (selectedMethod == "Gauss-Seidel")
+            {
+                SingleEquationPanel.Visibility = Visibility.Collapsed;
+                InitialGuessXaPanel.Visibility = Visibility.Collapsed;
+                InitialGuessXbPanel.Visibility = Visibility.Collapsed;
+                NumberOfEquationsPanel.Visibility = Visibility.Visible;
+                InitialGuessesInputPanel.Visibility = Visibility.Visible;
+                EquationsLabel.Visibility = Visibility.Visible;
+                EquationsInputPanel.Visibility = Visibility.Visible;
+                NumberOfEquationsTextBox.Visibility = Visibility.Visible;
+                RegressionInputPanel.Visibility = Visibility.Collapsed;
+                PolynomialDegreeLabel.Visibility = Visibility.Collapsed;
+                PolynomialDegreeTextBox.Visibility = Visibility.Collapsed;
+                LinearRegressionData.Visibility = Visibility.Collapsed;
+                PointCountSelector.Visibility = Visibility.Collapsed;
+                PointInputPanel.Visibility = Visibility.Collapsed;
+            }
+            else if (selectedMethod == "Linear Regression")
+            {
+                SingleEquationPanel.Visibility = Visibility.Collapsed;
+                InitialGuessXaPanel.Visibility = Visibility.Collapsed;
+                InitialGuessXbPanel.Visibility = Visibility.Collapsed;
+                PointCountSelector.Visibility = Visibility.Visible;
+                PointInputPanel.Visibility = Visibility.Visible;
+                LinearRegressionData.Visibility = Visibility.Visible;
+                InitialGuessXbPanel.Visibility = Visibility.Collapsed;
+                NumberOfEquationsPanel.Visibility = Visibility.Collapsed;
+                InitialGuessesInputPanel.Visibility = Visibility.Collapsed;
+                InitialGuessesLabel.Visibility = Visibility.Collapsed;
+                EquationsLabel.Visibility = Visibility.Collapsed;
+                EquationsInputPanel.Visibility = Visibility.Collapsed;
+                PolynomialDegreeLabel.Visibility = Visibility.Collapsed;
+                PolynomialDegreeTextBox.Visibility = Visibility.Collapsed;
+            }
+            else if (selectedMethod == "Polynomial Regression")
+            {
+                SingleEquationPanel.Visibility = Visibility.Collapsed;
+                InitialGuessXaPanel.Visibility = Visibility.Collapsed;
+                InitialGuessXbPanel.Visibility = Visibility.Collapsed;
+                PointCountSelector.Visibility = Visibility.Visible;
+                PointInputPanel.Visibility = Visibility.Visible;
+                LinearRegressionData.Visibility = Visibility.Visible;
+                InitialGuessXbPanel.Visibility = Visibility.Collapsed;
+                NumberOfEquationsPanel.Visibility = Visibility.Collapsed;
+                InitialGuessesInputPanel.Visibility = Visibility.Collapsed;
+                InitialGuessesLabel.Visibility = Visibility.Collapsed;
+                EquationsLabel.Visibility = Visibility.Collapsed;
+                EquationsInputPanel.Visibility = Visibility.Collapsed;
+                PolynomialDegreeLabel.Visibility = Visibility.Visible;
+                PolynomialDegreeTextBox.Visibility = Visibility.Visible;
+                RegressionInputPanel.Visibility = Visibility.Visible;
+            }
         }
 
         private void GenerateEquationInputFields()
@@ -155,10 +239,7 @@ namespace LVS_Gauss_Busters
             }
         }
 
-        private void MethodSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            UpdateInputVisibility();
-        }
+        
 
         private async void SolveButton_Click(object sender, RoutedEventArgs e)
         {
@@ -424,14 +505,16 @@ namespace LVS_Gauss_Busters
             {
                 try
                 {
-                    double[] x = InputXValues(); // Implement a method to read X values
-                    double[] y = InputYValues(); // Implement a method to read Y values
-                    int degree = GetPolynomialDegree(); // Implement a method to get the degree
+                    List<double> xValues = PointInputPanel.Children.OfType<StackPanel>()
+                        .Select(sp => double.Parse(((TextBox)sp.Children[1]).Text)).ToList();
+                    List<double> yValues = PointInputPanel.Children.OfType<StackPanel>()
+                        .Select(sp => double.Parse(((TextBox)sp.Children[2]).Text)).ToList();
 
-                    double[] coefficients = EquationSolver.PolynomialRegression(x, y, degree);
+                    int degree = GetPolynomialDegree();
+
+                    double[] coefficients = EquationSolver.PolynomialRegression(xValues.ToArray(), yValues.ToArray(), degree);
                     FinalRootText.Text = "y = " + string.Join(" + ", coefficients.Select((c, i) => $"{c:F4}x^{i}"));
-                    ResultListView.ItemsSource = new List<string> { "Polynomial regression performed." }; // Or any relevant steps
-
+                    ResultListView.ItemsSource = new List<string> { "Polynomial regression performed." };
                 }
                 catch (Exception ex)
                 {
@@ -440,27 +523,6 @@ namespace LVS_Gauss_Busters
             }
         }
 
-        private double[] InputXValues()
-        {
-            if (string.IsNullOrWhiteSpace(XValuesTextBox.Text))
-                throw new ArgumentException("X values cannot be empty.");
-
-            return XValuesTextBox.Text
-                .Split(',')
-                .Select(value => double.Parse(value.Trim()))
-                .ToArray();
-        }
-
-        private double[] InputYValues()
-        {
-            if (string.IsNullOrWhiteSpace(YValuesTextBox.Text))
-                throw new ArgumentException("Y values cannot be empty.");
-
-            return YValuesTextBox.Text
-                .Split(',')
-                .Select(value => double.Parse(value.Trim()))
-                .ToArray();
-        }
 
         private int GetPolynomialDegree()
         {
@@ -541,12 +603,19 @@ namespace LVS_Gauss_Busters
                 // Plot the data
                 var plt = PlotView.Plot;
                 plt.Clear();
+                PlotView.Plot.FigureBackground.Color = Color.FromHex("#1a1a1a");
+                PlotView.Plot.DataBackground.Color = Color.FromHex("#1a1a1a");
+                PlotView.Plot.Axes.Color(Color.FromHex("#d7d7d7"));
+                PlotView.Plot.Grid.MajorLineColor = Color.FromHex("#3a3a3a");
+                PlotView.Plot.Legend.BackgroundColor = Color.FromHex("#3a3a3a");
+                PlotView.Plot.Legend.FontColor = Color.FromHex("#e10600");
+                PlotView.Plot.Legend.OutlineColor = Color.FromHex("#e10600");
                 var scatter = plt.Add.Scatter(xValues, yValues);
                 scatter.Label = "Points";
-                scatter.Color = ScottPlot.Color.FromSDColor(System.Drawing.Color.Red);
+                scatter.Color = ScottPlot.Color.FromSDColor(System.Drawing.Color.White);
 
                 var line = plt.Add.Function(x => slope * x + intercept);
-                line.LineColor = ScottPlot.Color.FromSDColor(System.Drawing.Color.Blue);
+                line.LineColor = ScottPlot.Color.FromHex("#e10600");
                 line.Label = "Regression Line";
 
                 plt.Legend.IsVisible = true;
