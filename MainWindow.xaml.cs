@@ -38,164 +38,82 @@ namespace LVS_Gauss_Busters
             GenerateInitialGuessInputFields();
         }
 
-        private TextBlock NumberOfPointsLabel;
-
         private void MethodSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
             var selectedMethod = (MethodSelector.SelectedItem as ComboBoxItem)?.Content.ToString();
 
+            // Clear the solution steps and final root text
+            ResultListView.ItemsSource = null; // Clear the solution steps
+            ResultListView.Items.Clear();
+            FinalRootText.Text = ""; // Reset the final root text
+            PlotView.Plot.Clear(); // Clear any previous plot
+            PlotView.Visibility = Visibility.Collapsed; // Hide the plot
+
+            // Reset UI visibility for all panels
+            SingleEquationPanel.Visibility = Visibility.Collapsed;
+            InitialGuessXaPanel.Visibility = Visibility.Collapsed;
+            InitialGuessXbPanel.Visibility = Visibility.Collapsed;
+            NumberOfEquationsPanel.Visibility = Visibility.Collapsed;
+            InitialGuessesInputPanel.Visibility = Visibility.Collapsed;
+            InitialGuessesLabel.Visibility = Visibility.Collapsed;
+            EquationsLabel.Visibility = Visibility.Collapsed;
+            EquationsInputPanel.Visibility = Visibility.Collapsed;
+            RegressionInputPanel.Visibility = Visibility.Collapsed;
+            PolynomialDegreeLabel.Visibility = Visibility.Collapsed;
+            PolynomialDegreeTextBox.Visibility = Visibility.Collapsed;
+            LinearRegressionData.Visibility = Visibility.Collapsed;
+            PointCountSelector.Visibility = Visibility.Collapsed;
+            PointInputPanel.Visibility = Visibility.Collapsed;
+            PlotStack.Visibility = Visibility.Collapsed;
+            IntegrationInputPanel.Visibility = Visibility.Collapsed;
+
+            // Update UI based on the selected method
             if (selectedMethod == "Bisection" || selectedMethod == "Secant")
             {
                 SingleEquationPanel.Visibility = Visibility.Visible;
                 InitialGuessXaPanel.Visibility = Visibility.Visible;
                 InitialGuessXbPanel.Visibility = Visibility.Visible;
-                NumberOfEquationsPanel.Visibility = Visibility.Collapsed;
-                InitialGuessesInputPanel.Visibility = Visibility.Collapsed;
-                InitialGuessesLabel.Visibility = Visibility.Collapsed;
-                EquationsLabel.Visibility = Visibility.Collapsed;
-                EquationsInputPanel.Visibility = Visibility.Collapsed;
-                RegressionInputPanel.Visibility = Visibility.Collapsed;
-                PolynomialDegreeLabel.Visibility = Visibility.Collapsed;
-                PolynomialDegreeTextBox.Visibility = Visibility.Collapsed;
-                LinearRegressionData.Visibility = Visibility.Collapsed;
-                PointCountSelector.Visibility = Visibility.Collapsed;
-                PointInputPanel.Visibility = Visibility.Collapsed;
-                PlotStack.Visibility = Visibility.Collapsed;
-                PlotView.Visibility = Visibility.Collapsed;
-                ResultListView.ItemsSource = null;
-                FinalRootText.Text = "";
             }
             else if (selectedMethod == "Newton-Raphson")
             {
                 SingleEquationPanel.Visibility = Visibility.Visible;
                 InitialGuessXaPanel.Visibility = Visibility.Visible;
-                InitialGuessXbPanel.Visibility = Visibility.Collapsed;
-                NumberOfEquationsPanel.Visibility = Visibility.Collapsed;
-                InitialGuessesInputPanel.Visibility = Visibility.Collapsed;
-                InitialGuessesLabel.Visibility = Visibility.Collapsed;
-                EquationsLabel.Visibility = Visibility.Collapsed;
-                EquationsInputPanel.Visibility = Visibility.Collapsed;
-                RegressionInputPanel.Visibility = Visibility.Collapsed;
-                PolynomialDegreeLabel.Visibility = Visibility.Collapsed;
-                PolynomialDegreeTextBox.Visibility = Visibility.Collapsed;
-                LinearRegressionData.Visibility = Visibility.Collapsed;
-                PointCountSelector.Visibility = Visibility.Collapsed;
-                PointInputPanel.Visibility = Visibility.Collapsed;
-                PlotStack.Visibility = Visibility.Collapsed;
-                PlotView.Visibility = Visibility.Collapsed;
-                ResultListView.ItemsSource = null;
-                FinalRootText.Text = "";
             }
-            else if (selectedMethod == "Gaussian Elimination")
+            else if (selectedMethod == "Gaussian Elimination" || selectedMethod == "Gauss-Jordan" || selectedMethod == "Gauss-Seidel")
             {
-                SingleEquationPanel.Visibility = Visibility.Collapsed;
-                InitialGuessXaPanel.Visibility = Visibility.Collapsed;
-                InitialGuessXbPanel.Visibility = Visibility.Collapsed;
                 NumberOfEquationsPanel.Visibility = Visibility.Visible;
-                InitialGuessesInputPanel.Visibility = Visibility.Collapsed;
-                InitialGuessesLabel.Visibility = Visibility.Visible;
                 EquationsLabel.Visibility = Visibility.Visible;
                 EquationsInputPanel.Visibility = Visibility.Visible;
-                RegressionInputPanel.Visibility = Visibility.Collapsed;
-                PolynomialDegreeLabel.Visibility = Visibility.Collapsed;
-                PolynomialDegreeTextBox.Visibility = Visibility.Collapsed;
-                LinearRegressionData.Visibility = Visibility.Collapsed;
-                PointCountSelector.Visibility = Visibility.Collapsed;
-                PointInputPanel.Visibility = Visibility.Collapsed;
-                PlotStack.Visibility = Visibility.Collapsed;
-                PlotView.Visibility = Visibility.Collapsed;
-                ResultListView.ItemsSource = null;
-                FinalRootText.Text = "";
-            }
-            else if (selectedMethod == "Gauss-Jordan")
-            {
-                SingleEquationPanel.Visibility = Visibility.Collapsed;
-                InitialGuessXaPanel.Visibility = Visibility.Collapsed;
-                InitialGuessXbPanel.Visibility = Visibility.Collapsed;
-                NumberOfEquationsPanel.Visibility = Visibility.Visible;
-                InitialGuessesInputPanel.Visibility = Visibility.Collapsed;
-                InitialGuessesLabel.Visibility = Visibility.Collapsed;
-                EquationsLabel.Visibility = Visibility.Visible;
-                EquationsInputPanel.Visibility = Visibility.Visible;
-                RegressionInputPanel.Visibility = Visibility.Collapsed;
-                PolynomialDegreeLabel.Visibility = Visibility.Collapsed;
-                PolynomialDegreeTextBox.Visibility = Visibility.Collapsed;
-                LinearRegressionData.Visibility = Visibility.Collapsed;
-                PointCountSelector.Visibility = Visibility.Collapsed;
-                PointInputPanel.Visibility = Visibility.Collapsed;
-                PlotStack.Visibility = Visibility.Collapsed;
-                PlotView.Visibility = Visibility.Collapsed;
-                ResultListView.ItemsSource = null;
-                FinalRootText.Text = "";
-            }
-            else if (selectedMethod == "Gauss-Seidel")
-            {
-                SingleEquationPanel.Visibility = Visibility.Collapsed;
-                InitialGuessXaPanel.Visibility = Visibility.Collapsed;
-                InitialGuessXbPanel.Visibility = Visibility.Collapsed;
-                NumberOfEquationsPanel.Visibility = Visibility.Visible;
-                InitialGuessesInputPanel.Visibility = Visibility.Visible;
-                InitialGuessesLabel.Visibility = Visibility.Visible;
-                EquationsLabel.Visibility = Visibility.Visible;
-                EquationsInputPanel.Visibility = Visibility.Visible;
-                NumberOfEquationsTextBox.Visibility = Visibility.Visible;
-                RegressionInputPanel.Visibility = Visibility.Collapsed;
-                PolynomialDegreeLabel.Visibility = Visibility.Collapsed;
-                PolynomialDegreeTextBox.Visibility = Visibility.Collapsed;
-                LinearRegressionData.Visibility = Visibility.Collapsed;
-                PointCountSelector.Visibility = Visibility.Collapsed;
-                PointInputPanel.Visibility = Visibility.Collapsed;
-                PlotStack.Visibility = Visibility.Collapsed;
-                PlotView.Visibility = Visibility.Collapsed;
-                ResultListView.ItemsSource = null;
-                FinalRootText.Text = "";
+                if (selectedMethod == "Gauss-Seidel")
+                {
+                    InitialGuessesInputPanel.Visibility = Visibility.Visible;
+                    InitialGuessesLabel.Visibility = Visibility.Visible;
+                }
             }
             else if (selectedMethod == "Linear Regression")
             {
-                SingleEquationPanel.Visibility = Visibility.Collapsed;
-                InitialGuessXaPanel.Visibility = Visibility.Collapsed;
-                InitialGuessXbPanel.Visibility = Visibility.Collapsed;
+                LinearRegressionData.Visibility = Visibility.Visible;
                 PointCountSelector.Visibility = Visibility.Visible;
                 PointInputPanel.Visibility = Visibility.Visible;
-                LinearRegressionData.Visibility = Visibility.Visible;
-                InitialGuessXbPanel.Visibility = Visibility.Collapsed;
-                NumberOfEquationsPanel.Visibility = Visibility.Collapsed;
-                InitialGuessesInputPanel.Visibility = Visibility.Collapsed;
-                InitialGuessesLabel.Visibility = Visibility.Collapsed;
-                EquationsLabel.Visibility = Visibility.Collapsed;
-                EquationsInputPanel.Visibility = Visibility.Collapsed;
-                PolynomialDegreeLabel.Visibility = Visibility.Collapsed;
-                PolynomialDegreeTextBox.Visibility = Visibility.Collapsed;
                 PlotStack.Visibility = Visibility.Visible;
-                PlotView.Visibility = Visibility.Collapsed;
-                ResultListView.ItemsSource = null;
-                FinalRootText.Text = "";
             }
-
             else if (selectedMethod == "Polynomial Regression")
             {
-                SingleEquationPanel.Visibility = Visibility.Collapsed;
-                InitialGuessXaPanel.Visibility = Visibility.Collapsed;
-                InitialGuessXbPanel.Visibility = Visibility.Collapsed;
+                LinearRegressionData.Visibility = Visibility.Visible;
                 PointCountSelector.Visibility = Visibility.Visible;
                 PointInputPanel.Visibility = Visibility.Visible;
-                LinearRegressionData.Visibility = Visibility.Visible;
-                InitialGuessXbPanel.Visibility = Visibility.Collapsed;
-                NumberOfEquationsPanel.Visibility = Visibility.Collapsed;
-                InitialGuessesInputPanel.Visibility = Visibility.Collapsed;
-                InitialGuessesLabel.Visibility = Visibility.Collapsed;
-                EquationsLabel.Visibility = Visibility.Collapsed;
-                EquationsInputPanel.Visibility = Visibility.Collapsed;
                 PolynomialDegreeLabel.Visibility = Visibility.Visible;
                 PolynomialDegreeTextBox.Visibility = Visibility.Visible;
                 RegressionInputPanel.Visibility = Visibility.Visible;
                 PlotStack.Visibility = Visibility.Visible;
-                PlotView.Visibility = Visibility.Collapsed;
-                ResultListView.ItemsSource = null;
-                FinalRootText.Text = "";
+            }
+            else if (selectedMethod == "Trapezoidal" || selectedMethod == "Simpson's 1/3")
+            {
+                IntegrationInputPanel.Visibility = Visibility.Visible;
+                PlotStack.Visibility = Visibility.Visible;
             }
         }
+
 
         private void GenerateEquationInputFields()
         {
@@ -309,7 +227,7 @@ namespace LVS_Gauss_Busters
                     ResultListView.ItemsSource = steps.Select(step =>
                         $"Iter: {step.Iteration}, xl: {step.Xl:F4}, xr: {step.Xr:F4}, xm: {step.Xm:F4}, f(xm): {step.Fxm:F4}, Error: {step.Error:F4}"
                     ).ToList();
-                    FinalRootText.Text = $"Approximate Root: {root:F5}";
+                    FinalRootText.Text = $"Approximate Root: {root:F4}";
                 }
                 catch (ArgumentException ex)
                 {
@@ -321,6 +239,7 @@ namespace LVS_Gauss_Busters
                     FinalRootText.Text = $"Error during Bisection: {ex.Message}";
                     ResultListView.ItemsSource = null;
                 }
+
                 return;
             }
             // NEWTON-RAPHSON METHOD
@@ -346,7 +265,7 @@ namespace LVS_Gauss_Busters
                     ResultListView.ItemsSource = steps.Select(step =>
                         $"Iter: {step.Iteration}, x: {step.X:F4}, f(x): {step.Fx:F4}, f'(x): {step.Fxm:F4}, Error: {step.Error:F4}"
                     ).ToList();
-                    FinalRootText.Text = $"Approximate Root: {root:F5}";
+                    FinalRootText.Text = $"Approximate Root: {root:F4}";
                 }
                 catch (Exception ex)
                 {
@@ -384,7 +303,7 @@ namespace LVS_Gauss_Busters
                     ResultListView.ItemsSource = steps.Select(step =>
                         $"Iter: {step.Iteration}, x0: {step.Xl:F4}, x1: {step.Xr:F4}, x2: {step.Xm:F4}, f(x2): {step.Fx:F4}, Error: {step.Error:F4}"
                     ).ToList();
-                    FinalRootText.Text = $"Approximate Root: {root:F5}";
+                    FinalRootText.Text = $"Approximate Root: {root:F4}";
                 }
                 catch (Exception ex)
                 {
@@ -499,7 +418,7 @@ namespace LVS_Gauss_Busters
                                         calculation += $" - {aMatrix[i, j]} * {step.Values[j]:F4}";
                                     }
                                 }
-                                calculation += $") / {aMatrix[i, i]} = {step.Values[i]:F5}";
+                                calculation += $") / {aMatrix[i, i]} = {step.Values[i]:F4}";
                                 output.Add(calculation);
                             }
                             output.Add(""); // Blank line for separation
@@ -528,8 +447,91 @@ namespace LVS_Gauss_Busters
             }
             else if (method == "Linear Regression")
             {
-                await SolveButton_Click_LinearRegression(sender, e);
+                try
+                {
+                    var xValues = PointInputPanel.Children.OfType<StackPanel>()
+                        .Select(sp => double.Parse(((TextBox)sp.Children[1]).Text)).ToArray();
+                    var yValues = PointInputPanel.Children.OfType<StackPanel>()
+                        .Select(sp => double.Parse(((TextBox)sp.Children[2]).Text)).ToArray();
+
+                    var (slope, intercept) = EquationSolver.LinearRegression(xValues, yValues);
+
+                    // Construct the solution text
+                    var solutionBuilder = new System.Text.StringBuilder();
+                    solutionBuilder.AppendLine("=== Construct Table of Values ===");
+                    solutionBuilder.AppendLine($"{"x",10} {"y",10} {"x*y",10} {"x^2",10}");
+                    double sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+
+                    for (int i = 0; i < xValues.Length; i++)
+                    {
+                        double x = xValues[i];
+                        double y = yValues[i];
+                        double xy = x * y;
+                        double x2 = x * x;
+
+                        sumX += x;
+                        sumY += y;
+                        sumXY += xy;
+                        sumX2 += x2;
+
+                        solutionBuilder.AppendLine($"{x,10:F4} {y,10:F4} {xy,10:F4} {x2,10:F4}");
+                    }
+
+                    solutionBuilder.AppendLine();
+                    solutionBuilder.AppendLine("=== Calculate Summations ===");
+                    solutionBuilder.AppendLine($"?x = {sumX:F4}, ?y = {sumY:F4}, ?xy = {sumXY:F4}, ?x² = {sumX2:F4}");
+                    solutionBuilder.AppendLine();
+                    solutionBuilder.AppendLine("=== Compute the Slope (m) and Intercept (b) ===");
+                    solutionBuilder.AppendLine($"m = (n?xy - ?x?y) / (n?x² - (?x)²)");
+                    solutionBuilder.AppendLine($"m = ({xValues.Length} * {sumXY:F4} - {sumX:F4} * {sumY:F4}) / ({xValues.Length} * {sumX2:F4} - {sumX:F4}²) = {slope:F4}");
+                    solutionBuilder.AppendLine($"b = (?y - m?x) / n");
+                    solutionBuilder.AppendLine($"b = ({sumY:F4} - {slope:F4} * {sumX:F4}) / {xValues.Length} = {intercept:F4}");
+                    solutionBuilder.AppendLine();
+                    solutionBuilder.AppendLine($"Final Linear Regression Equation: y = {slope:F4}x + {intercept:F4}");
+
+                    // Display the solution
+                    string[] solutionLines = solutionBuilder.ToString().Split(new[] { Environment.NewLine }, StringSplitOptions.None);
+                    FinalRootText.Text = $"y = {slope:F4}x + {intercept:F4}";
+
+                    // Clear previous items and update ResultListView
+                    ResultListView.Items.Clear();
+                    foreach (var solutionLine in solutionLines)
+                    {
+                        if (!string.IsNullOrWhiteSpace(solutionLine))
+                            ResultListView.Items.Add(solutionLine);
+                    }
+
+                    // Plot the data
+                    var plt = PlotView.Plot;
+                    plt.Clear();
+                    PlotView.Plot.FigureBackground.Color = Color.FromHex("#1a1a1a");
+                    PlotView.Plot.DataBackground.Color = Color.FromHex("#1a1a1a");
+                    PlotView.Plot.Axes.Color(Color.FromHex("#d7d7d7"));
+                    PlotView.Plot.Grid.MajorLineColor = Color.FromHex("#3a3a3a");
+                    PlotView.Plot.Legend.BackgroundColor = Color.FromHex("#3a3a3a");
+                    PlotView.Plot.Legend.FontColor = Color.FromHex("#e10600");
+                    PlotView.Plot.Legend.OutlineColor = Color.FromHex("#e10600");
+                    var scatter = plt.Add.Scatter(xValues, yValues);
+                    scatter.Label = "Points";
+                    scatter.Color = ScottPlot.Color.FromSDColor(System.Drawing.Color.White);
+
+                    var line = plt.Add.Function(x => slope * x + intercept);
+                    line.LineColor = ScottPlot.Color.FromHex("#e10600");
+                    line.Label = "Regression Line";
+
+                    plt.Legend.IsVisible = true;
+                    PlotView.Visibility = Visibility.Visible;
+                    PlotView.Refresh();
+                }
+                catch (Exception ex)
+                {
+                    FinalRootText.Text = $"Error: {ex.Message}";
+                    ResultListView.ItemsSource = new List<string> { $"Error: {ex.Message}" };
+                    PlotView.Plot.Clear(); // Clear any previous plot
+                    PlotView.Visibility = Visibility.Collapsed; // Hide plot on error
+                }
             }
+
             else if (method == "Polynomial Regression")
             {
                 try
@@ -596,6 +598,116 @@ namespace LVS_Gauss_Busters
                     PlotView.Visibility = Visibility.Collapsed; // Hide plot on error
                 }
             }
+
+            else if (method == "Trapezoidal")
+            {
+                string function = IntegrationFunctionInput.Text;
+                if (!double.TryParse(IntegrationLowerBoundInput.Text, out double a) ||
+                    !double.TryParse(IntegrationUpperBoundInput.Text, out double b) ||
+                    !int.TryParse(IntegrationDivisionsInput.Text, out int n))
+                {
+                    FinalRootText.Text = "Invalid input for Trapezoidal method.";
+                    return;
+                }
+
+                (string steps, double[] xPoints, double[] yPoints, double result) = EquationSolver.TrapezoidalRuleWithPlotData(function, a, b, n);
+
+                ResultListView.ItemsSource = steps.Split('\n').Where(line => !string.IsNullOrWhiteSpace(line)).ToList();
+                PlotTrapezoidal(function, a, b, n, xPoints, yPoints);
+                FinalRootText.Text = $"Integral Result: {result:F4}";
+                PlotStack.Visibility = Visibility.Visible;
+            }
+
+            else if (method == "Simpson's 1/3")
+            {
+                if (!int.TryParse(IntegrationDivisionsInput.Text, out int divisions) || divisions <= 0 || divisions % 2 != 0)
+                {
+                    FinalRootText.Text = "Error: Invalid number of divisions for Simpson's 1/3 Rule. Must be a positive even integer.";
+                    return;
+                }
+
+                string function = IntegrationFunctionInput.Text;
+                double a = double.Parse(IntegrationLowerBoundInput.Text);
+                double b = double.Parse(IntegrationUpperBoundInput.Text);
+                (string steps, double[] xPoints, double[] yPoints, double result) = EquationSolver.SimpsonsRuleWithPlotData(function, a, b, divisions);
+
+                string[] formattedSteps = steps.Split('\n');
+                foreach (var step in formattedSteps)
+                {
+                    if (!string.IsNullOrWhiteSpace(step))
+                    {
+                        ResultListView.Items.Add(step);
+                    }
+                }
+
+                PlotSimpsons(function, a, b, divisions, xPoints, yPoints);
+                PlotStack.Visibility = Visibility.Visible;
+                FinalRootText.Text = $"Integral Result: {result:F4}"; // Display the result of the integration
+            }
+        }
+
+        private void PlotTrapezoidal(string function, double a, double b, int n, double[] xPoints, double[] yPoints)
+        {
+            var plt = PlotView.Plot;
+            plt.Clear();
+
+            // Plot the function
+            double[] xFine = Enumerable.Range(0, 200).Select(i => a + i * (b - a) / 199).ToArray();
+            double[] yFine = xFine.Select(x => EquationSolver.EvaluateFunction(function, x)).ToArray();
+            plt.Add.Scatter(xFine, yFine).LegendText = "f(x)";
+            plt.Add.Scatter(xFine, yFine).Color = ScottPlot.Color.FromHex("#E10600");
+
+
+            // Plot the trapezoids
+            for (int i = 0; i < n; i++)
+            {
+                double[] xTrap = { xPoints[i], xPoints[i + 1], xPoints[i + 1], xPoints[i] };
+                double[] yTrap = { 0, 0, yPoints[i + 1], yPoints[i] };
+                plt.Add.Polygon(xTrap, yTrap).FillColor = ScottPlot.Color.FromHex("#64FF0000");
+            }
+
+            // Apply dark theme
+            plt.FigureBackground.Color = ScottPlot.Color.FromHex("#1a1a1a");
+            plt.DataBackground.Color = ScottPlot.Color.FromHex("#1a1a1a");
+            plt.Axes.Color(ScottPlot.Color.FromHex("#d7d7d7"));
+            plt.Grid.MajorLineColor = ScottPlot.Color.FromHex("#3a3a3a");
+            plt.Legend.BackgroundColor = ScottPlot.Color.FromHex("#3a3a3a");
+            plt.Legend.FontColor = ScottPlot.Color.FromHex("#e10600");
+            plt.Legend.OutlineColor = ScottPlot.Color.FromHex("#e10600");
+
+            // Add title and labels
+            plt.Title($"Trapezoidal Rule (n={n})", size: 18);
+            plt.XLabel("x", size: 14);
+            plt.YLabel("f(x)", size: 14);
+
+            plt.Legend.IsVisible = true;
+            PlotView.Visibility = Visibility.Visible;
+            PlotView.Refresh();
+        }
+
+
+
+        private void PlotSimpsons(string function, double a, double b, int n, double[] xPoints, double[] yPoints)
+        {
+            var plot = PlotView.Plot;
+            plot.Clear();
+
+            // Plot the function
+            double[] xFine = Enumerable.Range(0, 200).Select(i => a + i * (b - a) / 199).ToArray();
+            double[] yFine = xFine.Select(x => EquationSolver.EvaluateFunction(function, x)).ToArray();
+            plot.Add.Scatter(xFine, yFine).Label = "f(x)";
+
+            // Plot the points used in Simpson's rule
+            var scatter = plot.Add.Scatter(xPoints, yPoints);
+            scatter.LegendText = "Simpson's Points";
+            scatter.Color = ScottPlot.Color.FromSDColor(System.Drawing.Color.Red);
+
+            plot.Title("Simpson's 1/3 Rule");
+            plot.XLabel("x");
+            plot.YLabel("f(x)");
+            plot.Legend.IsVisible = true;
+            PlotView.Visibility = Visibility.Visible;
+            PlotView.Refresh();
         }
 
         private void PlotPolynomialRegression(double[] xValues, double[] yValues, double[] coefficients)
@@ -611,14 +723,14 @@ namespace LVS_Gauss_Busters
             var plt = PlotView.Plot;
             plt.Clear();
 
-            // --- Styling the Plot (You already have this in your Linear Regression, let's reuse/adapt) ---
-            PlotView.Plot.FigureBackground.Color = Color.FromHex("#1a1a1a");
-            PlotView.Plot.DataBackground.Color = Color.FromHex("#1a1a1a");
-            PlotView.Plot.Axes.Color(Color.FromHex("#d7d7d7"));
-            PlotView.Plot.Grid.MajorLineColor = Color.FromHex("#3a3a3a");
-            PlotView.Plot.Legend.BackgroundColor = Color.FromHex("#3a3a3a");
-            PlotView.Plot.Legend.FontColor = Color.FromHex("#e10600");
-            PlotView.Plot.Legend.OutlineColor = Color.FromHex("#e10600");
+            // Apply dark theme
+            plt.FigureBackground.Color = ScottPlot.Color.FromHex("#1a1a1a");
+            plt.DataBackground.Color = ScottPlot.Color.FromHex("#1a1a1a");
+            plt.Axes.Color(ScottPlot.Color.FromHex("#d7d7d7"));
+            plt.Grid.MajorLineColor = ScottPlot.Color.FromHex("#3a3a3a");
+            plt.Legend.BackgroundColor = ScottPlot.Color.FromHex("#3a3a3a");
+            plt.Legend.FontColor = ScottPlot.Color.FromHex("#e10600");
+            plt.Legend.OutlineColor = ScottPlot.Color.FromHex("#e10600");
 
             // Plot the original data points
             var scatter = plt.Add.Scatter(xValues, yValues);
@@ -636,10 +748,16 @@ namespace LVS_Gauss_Busters
             line.LineColor = ScottPlot.Color.FromHex("#e10600");
             line.Label = $"Polynomial (Degree {coefficients.Length - 1})";
 
+            // Add title and labels
+            plt.Title($"Polynomial Regression (Degree {coefficients.Length - 1})", size: 18);
+            plt.XLabel("x", size: 14); // Removed the 'color' parameter
+            plt.YLabel("y", size: 14); // Removed the 'color' parameter
+
             plt.Legend.IsVisible = true;
             PlotView.Visibility = Visibility.Visible;
             PlotView.Refresh();
         }
+
 
         // Helper function to evaluate the polynomial
         private double[] EvaluatePolynomial(double[] x, double[] coefficients)
@@ -698,116 +816,6 @@ namespace LVS_Gauss_Busters
                     stackPanel.Children.Add(new TextBox { Name = $"Y{i}", Width = 50 });
                     PointInputPanel.Children.Add(stackPanel);
                 }
-            }
-        }
-
-        private async Task SolveButton_Click_LinearRegression(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                var xValues = PointInputPanel.Children.OfType<StackPanel>()
-                    .Select(sp => double.Parse(((TextBox)sp.Children[1]).Text)).ToArray();
-                var yValues = PointInputPanel.Children.OfType<StackPanel>()
-                    .Select(sp => double.Parse(((TextBox)sp.Children[2]).Text)).ToArray();
-
-                var (slope, intercept) = EquationSolver.LinearRegression(xValues, yValues);
-
-                // Construct the solution text
-                var solutionBuilder = new System.Text.StringBuilder();
-                solutionBuilder.AppendLine("=== Construct Table of Values ===");
-                solutionBuilder.AppendLine($"{"x",10} {"y",10} {"x*y",10} {"x^2",10}");
-                double sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
-
-                for (int i = 0; i < xValues.Length; i++)
-                {
-                    double x = xValues[i];
-                    double y = yValues[i];
-                    double xy = x * y;
-                    double x2 = x * x;
-
-                    sumX += x;
-                    sumY += y;
-                    sumXY += xy;
-                    sumX2 += x2;
-
-                    solutionBuilder.AppendLine($"{x,10:F4} {y,10:F4} {xy,10:F4} {x2,10:F4}");
-                }
-
-                solutionBuilder.AppendLine();
-                solutionBuilder.AppendLine("=== Calculate Summations ===");
-                solutionBuilder.AppendLine($"?x = {sumX:F4}, ?y = {sumY:F4}, ?xy = {sumXY:F4}, ?x² = {sumX2:F4}");
-                solutionBuilder.AppendLine();
-                solutionBuilder.AppendLine("=== Compute the Slope (m) and Intercept (b) ===");
-                solutionBuilder.AppendLine($"m = (n?xy - ?x?y) / (n?x² - (?x)²)");
-                solutionBuilder.AppendLine($"m = ({xValues.Length} * {sumXY:F4} - {sumX:F4} * {sumY:F4}) / ({xValues.Length} * {sumX2:F4} - {sumX:F4}²) = {slope:F4}");
-                solutionBuilder.AppendLine($"b = (?y - m?x) / n");
-                solutionBuilder.AppendLine($"b = ({sumY:F4} - {slope:F4} * {sumX:F4}) / {xValues.Length} = {intercept:F4}");
-                solutionBuilder.AppendLine();
-                solutionBuilder.AppendLine($"Final Linear Regression Equation: y = {slope:F4}x + {intercept:F4}");
-
-                // Display the solution
-                // Display the solution in both TextBlock and ListView
-                string[] solutionLines = solutionBuilder.ToString().Split(new[] { Environment.NewLine }, StringSplitOptions.None);
-                string finalEquation = "y = ";
-                if (slope >= 0)
-                {
-                    finalEquation += $"{slope:F4}x";
-                }
-                else
-                {
-                    finalEquation += $"{slope:F4}x"; // Negative sign is included
-                }
-
-                if (intercept >= 0)
-                {
-                    finalEquation += $" + {intercept:F4}";
-                }
-                else
-                {
-                    finalEquation += $" {intercept:F4}"; // Negative sign is included
-                }
-                FinalRootText.Text = finalEquation;
-
-                // Clear previous items and update ResultListView
-                ResultListView.Items.Clear();
-                foreach (var solutionLine in solutionLines)
-                {
-                    if (!string.IsNullOrWhiteSpace(solutionLine))
-                        ResultListView.Items.Add(solutionLine);
-                }
-
-                // Plot the data
-                var plt = PlotView.Plot;
-                plt.Clear();
-                PlotView.Plot.FigureBackground.Color = Color.FromHex("#1a1a1a");
-                PlotView.Plot.DataBackground.Color = Color.FromHex("#1a1a1a");
-                PlotView.Plot.Axes.Color(Color.FromHex("#d7d7d7"));
-                PlotView.Plot.Grid.MajorLineColor = Color.FromHex("#3a3a3a");
-                PlotView.Plot.Legend.BackgroundColor = Color.FromHex("#3a3a3a");
-                PlotView.Plot.Legend.FontColor = Color.FromHex("#e10600");
-                PlotView.Plot.Legend.OutlineColor = Color.FromHex("#e10600");
-                var scatter = plt.Add.Scatter(xValues, yValues);
-                scatter.Label = "Points";
-                scatter.Color = ScottPlot.Color.FromSDColor(System.Drawing.Color.White);
-
-                var line = plt.Add.Function(x => slope * x + intercept);
-                line.LineColor = ScottPlot.Color.FromHex("#e10600");
-                line.Label = "Regression Line";
-
-                plt.Legend.IsVisible = true;
-                PlotView.Visibility = Visibility.Visible;
-                PlotView.Refresh();
-            }
-            catch (Exception ex)
-            {
-                ContentDialog errorDialog = new ContentDialog
-                {
-                    Title = "Error",
-                    Content = $"Error: {ex.Message}",
-                    CloseButtonText = "OK",
-                    XamlRoot = this.Content.XamlRoot // Ensure the dialog is tied to the current window
-                };
-                await errorDialog.ShowAsync(); // Await is now valid because the method is async
             }
         }
     }

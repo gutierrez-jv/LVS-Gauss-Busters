@@ -41,8 +41,10 @@
                         <ComboBoxItem Content="Gauss-Seidel"/>
                         <ComboBoxItem Content="Linear Regression"/>
                         <ComboBoxItem Content="Polynomial Regression"/>
+                        <ComboBoxItem Content="Trapezoidal"/>
+                        <ComboBoxItem Content="Simpson's 1/3"/>
                     </ComboBox>
-
+    
                     <StackPanel x:Name="NumberOfEquationsPanel" Visibility="Collapsed">
                         <TextBlock Text="Number of Equations:" Foreground="White" x:Name="NumberOfEquationsLabel"/>
                         <TextBox x:Name="NumberOfEquationsTextBox" Text="3" InputScope="Number" TextChanged="NumberOfEquationsTextBox_TextChanged"/>
@@ -90,6 +92,21 @@
                             <ComboBoxItem Content="15"/>
                         </ComboBox>
                         <StackPanel x:Name="PointInputPanel" Spacing="10" Margin="0,10,0,0" Visibility="Collapsed"/>
+                    </StackPanel>
+
+                    <!-- Integration Input Panel -->
+                    <StackPanel x:Name="IntegrationInputPanel" Visibility="Collapsed" Spacing="10">
+                        <TextBlock Text="Function (e.g., x^2):" Foreground="White"/>
+                        <TextBox x:Name="IntegrationFunctionInput" PlaceholderText="Enter function" Background="#2D2D2D" Foreground="White" />
+
+                        <TextBlock Text="Lower Bound (a):" Foreground="White"/>
+                        <TextBox x:Name="IntegrationLowerBoundInput" PlaceholderText="Enter lower bound" Background="#2D2D2D" Foreground="White" />
+
+                        <TextBlock Text="Upper Bound (b):" Foreground="White"/>
+                        <TextBox x:Name="IntegrationUpperBoundInput" PlaceholderText="Enter upper bound" Background="#2D2D2D" Foreground="White" />
+
+                        <TextBlock Text="Number of Divisions (n):" Foreground="White"/>
+                        <TextBox x:Name="IntegrationDivisionsInput" PlaceholderText="Enter number of divisions" Background="#2D2D2D" Foreground="White" />
                     </StackPanel>
 
                     <Button x:Name="SolveButton" Content="BUST IT!" Click="SolveButton_Click"

@@ -4,6 +4,8 @@ using System.Text.RegularExpressions;
 using NCalc;
 using LVS_Gauss_Busters.Models;
 using System.Linq;
+using System.Text; // Add this namespace at the top of the file
+
 
 namespace LVS_Gauss_Busters
 {
@@ -690,10 +692,7 @@ namespace LVS_Gauss_Busters
 
                 // Make the pivot element 1
                 double pivot = augmentedMatrix[i, i];
-                if (Math.Abs(pivot) < 1e-9)
-                {
-                    throw new ArithmeticException("System has no unique solution or is singular.");
-                }
+
                 for (int j = i; j <= n; j++)
                 {
                     augmentedMatrix[i, j] /= pivot;
@@ -722,6 +721,83 @@ namespace LVS_Gauss_Busters
             }
 
             return coefficients;
+        }
+
+        public static (string steps, double[] xPoints, double[] yPoints, double result) TrapezoidalRuleWithPlotData(string expression, double a, double b, int n)
+        {
+            StringBuilder steps = new StringBuilder();
+            double h = (b - a) / n;
+            steps.AppendLine($"Executing Trapezoidal Rule with n = {n}, step size h = ({b} - {a}) / {n} = {h:F4}");
+            steps.AppendLine($"\n--- Step 1: Compute f(x) at the boundaries and intermediate points ---");
+
+            double sum = 0;
+            double[] xPoints = new double[n + 1];
+            double[] yPoints = new double[n + 1];
+
+            for (int i = 0; i <= n; i++)
+            {
+                double x = a + i * h;
+                double y = EvaluateFunction(expression, x);
+                xPoints[i] = x;
+                yPoints[i] = y;
+
+                steps.AppendLine($"  f(x[{i}]) = f({x:F4}) = {y:F4}");
+                sum += (i == 0 || i == n) ? y : 2 * y;
+            }
+
+            steps.AppendLine($"\n--- Step 2: Apply the Trapezoidal Rule formula ---");
+            steps.AppendLine($"Integral ≈ (h / 2) * [f(x[0]) + 2f(x[1]) + ... + 2f(x[{n - 1}]) + f(x[{n}])]");
+            steps.AppendLine($"         ≈ ({h:F4} / 2) * [{sum:F4}]");
+            double result = (h / 2) * sum;
+            steps.AppendLine($"         ≈ {result:F4}");
+
+            return (steps.ToString(), xPoints, yPoints, result);
+        }
+
+
+
+
+        public static (string steps, double[] xPoints, double[] yPoints, double result) SimpsonsRuleWithPlotData(string expression, double a, double b, int n)
+        {
+            StringBuilder steps = new StringBuilder();
+            if (n % 2 != 0)
+            {
+                throw new ArgumentException("The number of divisions for Simpson's 1/3 Rule must be an even integer.");
+            }
+
+            double h = (b - a) / n;
+            steps.AppendLine($"Applying Simpson's 1/3 Rule with n = {n}, h = ({b} - {a}) / {n} = {h:F4}");
+            steps.AppendLine($"\n──── Step 1: Evaluate f(x) at the endpoints and intermediate points: ────");
+            double sum = 0;
+            double[] xValues = new double[n + 1];
+            double[] yValues = new double[n + 1];
+
+            for (int i = 0; i <= n; i++)
+            {
+                double x = a + i * h;
+                double y = EvaluateFunction(expression, x);
+                if (double.IsNaN(y) || double.IsInfinity(y))
+                {
+                    throw new ArgumentException($"Function evaluation resulted in a non-finite value at x = {x}. Please check your function and bounds.");
+                }
+                steps.AppendLine($"  f(x_{i}) = f({x:F4}) = {y:F4}");
+                if (i == 0 || i == n)
+                    sum += y;
+                else if (i % 2 == 0)
+                    sum += 2 * y;
+                else
+                    sum += 4 * y;
+                xValues[i] = x;
+                yValues[i] = y;
+            }
+
+            steps.AppendLine($"\n──── Step 2: Apply the Simpson's 1/3 Rule formula: ────");
+            steps.AppendLine($"Integral ≈ (h / 3) * [f(x_0) + 4f(x_1) + 2f(x_2) + 4f(x_3) + ... + 4f(x_{n - 1}) + f(x_n)]");
+            steps.AppendLine($"         ≈ ({h:F4} / 3) * [{sum:F4}]");
+            double result = (h / 3) * sum;
+            steps.AppendLine($"         ≈ {result:F4}");
+
+            return (steps.ToString(), xValues, yValues, result);
         }
     }
 }
