@@ -13,6 +13,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Assets\Audio\bg_music.mp3" />
+    <None Remove="Assets\Audio\bust_it.mp3" />
+    <None Remove="Assets\Audio\bust_it.wav" />
     <None Remove="Assets\ghostbusters_logo-removebg-preview.png" />
   </ItemGroup>
 
@@ -47,6 +50,15 @@
     <PackageReference Include="ScottPlot.WinUI" Version="5.0.55" />
   </ItemGroup>
   <ItemGroup>
+    <Content Update="Assets\Audio\bg_music.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Audio\bust_it.mp3">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Audio\bust_it.wav">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Update="Assets\ghostbusters_logo-removebg-preview.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

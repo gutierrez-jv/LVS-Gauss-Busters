@@ -1,16 +1,14 @@
+using LVS_Gauss_Busters.Helpers;
+using LVS_Gauss_Busters.Models;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Markup;
-using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Navigation;
+using ScottPlot;
+using ScottPlot.WinUI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using LVS_Gauss_Busters.Models;
-using ScottPlot;
-using ScottPlot.WinUI;
-using System.Threading.Tasks;
 
 namespace LVS_Gauss_Busters
 {
@@ -31,6 +29,7 @@ namespace LVS_Gauss_Busters
         public MainWindow()
         {
             this.InitializeComponent();
+            this.Activated += MainWindow_Loaded;
             PointCountSelectorField = (ComboBox)((FrameworkElement)this.Content).FindName("PointCountSelector");
             PointInputPanelField = (StackPanel)((FrameworkElement)this.Content).FindName("PointInputPanel");
             PlotViewControl = (WinUIPlot)((FrameworkElement)this.Content).FindName("PlotView"); // Use PlotViewControl here
@@ -114,10 +113,10 @@ namespace LVS_Gauss_Busters
                 PlotStack.Visibility = Visibility.Visible;
             }
 
-            else if(selectedMethod == "Euler")
+            else if (selectedMethod == "Euler")
             {
                 EulerInputPanel.Visibility = Visibility.Visible;
-                PlotStack.Visibility = Visibility.Visible;  
+                PlotStack.Visibility = Visibility.Visible;
             }
         }
 
@@ -919,6 +918,28 @@ namespace LVS_Gauss_Busters
                     stackPanel.Children.Add(new TextBox { Name = $"Y{i}", Width = 50 });
                     PointInputPanel.Children.Add(stackPanel);
                 }
+            }
+        }
+
+
+        private async void SolveButtonSound_Click(object sender, RoutedEventArgs e)
+        {
+            await AudioHelper.PlaySoundEffectAsync("Assets/Audio/bust_it.mp3");
+        }
+        private void MainWindow_Loaded(object sender, WindowActivatedEventArgs e)
+        {
+            AudioHelper.PlayBackgroundMusic("Assets/Audio/bg_music.mp3");
+        }
+
+        private void MusicToggle_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (MusicToggle.IsOn)
+            {
+                AudioHelper.PlayBackgroundMusic("Assets/Audio/bg_music.mp3"); // Re-play if toggled back on
+            }
+            else
+            {
+                AudioHelper.StopBackgroundMusic();
             }
         }
     }

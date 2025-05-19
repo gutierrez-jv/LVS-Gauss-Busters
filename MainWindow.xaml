@@ -129,15 +129,19 @@
                     </StackPanel>
 
 
-                    <Button x:Name="SolveButton" Content="BUST IT!" Click="SolveButton_Click"
+                    <Button x:Name="SolveButton" Content="BUST IT!" Click="SolveButton_Click" PointerPressed="SolveButtonSound_Click"
                             Height="45" Background="#E10600" FontFamily="Rockwell"
                             Foreground="White" FontWeight="Bold" BorderBrush="White"
                             BorderThickness="2" CornerRadius="8" Margin="0,10,0,0"/>
+                    <ToggleSwitch x:Name="MusicToggle" Header="Music" IsOn="True" Toggled="MusicToggle_Toggled" Margin="0,10,0,0"/>
                 </StackPanel>
 
+                <!-- Output Section -->
                 <StackPanel Grid.Column="1" Padding="20" Background="#1A1A1A" CornerRadius="15" Spacing="10" Margin="10,0,0,0">
+                    <!-- Title -->
                     <TextBlock Text="Solution Steps" FontSize="26" FontWeight="Bold" FontFamily="Rockwell" Foreground="White" Margin="0 0 0 10"/>
 
+                    <!-- Scrollable Result View -->
                     <ScrollViewer VerticalScrollBarVisibility="Auto" Height="350">
                         <ListView x:Name="ResultListView" Background="#2D2D2D" Foreground="White" BorderThickness="0" SelectionMode="None">
                             <ListView.ItemTemplate>
@@ -148,14 +152,15 @@
                         </ListView>
                     </ScrollViewer>
 
+                    <!-- Final Answer -->
                     <TextBlock x:Name="FinalRootText" Foreground="#7CFC00" FontSize="16" FontFamily="Rockwell"
                                FontWeight="Bold" Margin="0,10,0,0" TextWrapping="Wrap"/>
 
+                    <!-- Plot Section -->
                     <StackPanel x:Name="PlotStack" Visibility="Collapsed">
                         <TextBlock Text="Plot" FontSize="26" FontWeight="Bold" FontFamily="Rockwell" Foreground="White" Margin="0 20 0 10"/>
                         <scottplot:WinUIPlot x:Name="PlotView" Height="300" Background="#2D2D2D" Visibility="Collapsed"/>
                     </StackPanel>
-
                 </StackPanel>
             </Grid>
         </Grid>
