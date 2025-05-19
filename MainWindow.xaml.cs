@@ -66,6 +66,7 @@ namespace LVS_Gauss_Busters
             PointInputPanel.Visibility = Visibility.Collapsed;
             PlotStack.Visibility = Visibility.Collapsed;
             IntegrationInputPanel.Visibility = Visibility.Collapsed;
+            EulerInputPanel.Visibility = Visibility.Collapsed;
 
             // Update UI based on the selected method
             if (selectedMethod == "Bisection" || selectedMethod == "Secant")
@@ -111,6 +112,12 @@ namespace LVS_Gauss_Busters
             {
                 IntegrationInputPanel.Visibility = Visibility.Visible;
                 PlotStack.Visibility = Visibility.Visible;
+            }
+
+            else if(selectedMethod == "Euler")
+            {
+                EulerInputPanel.Visibility = Visibility.Visible;
+                PlotStack.Visibility = Visibility.Visible;  
             }
         }
 
@@ -644,7 +651,103 @@ namespace LVS_Gauss_Busters
                 PlotStack.Visibility = Visibility.Visible;
                 FinalRootText.Text = $"Integral Result: {result:F4}"; // Display the result of the integration
             }
+
+            else if (method == "Euler")
+            {
+                if (string.IsNullOrEmpty(DifferentialEquationInput.Text) ||
+                    string.IsNullOrEmpty(InitialXInput.Text) ||
+                    string.IsNullOrEmpty(InitialYInput.Text) ||
+                    string.IsNullOrEmpty(EndXInput.Text) ||
+                    string.IsNullOrEmpty(StepSizeInput.Text))
+                {
+                    FinalRootText.Text = "Please fill in all the Euler method parameters.";
+                    return;
+                }
+
+                if (!double.TryParse(InitialXInput.Text, out double initialX))
+                {
+                    FinalRootText.Text = "Invalid input for initial x (x?).";
+                    return;
+                }
+                if (!double.TryParse(InitialYInput.Text, out double initialY))
+                {
+                    FinalRootText.Text = "Invalid input for initial y (y?).";
+                    return;
+                }
+                if (!double.TryParse(EndXInput.Text, out double endX))
+                {
+                    FinalRootText.Text = "Invalid input for end x.";
+                    return;
+                }
+                if (!double.TryParse(StepSizeInput.Text, out double stepSize))
+                {
+                    FinalRootText.Text = "Invalid input for step size (h).";
+                    return;
+                }
+
+                List<StepResult> stepsList = new List<StepResult>(); // Not directly used in Euler, but kept for consistency if you want to extend
+                try
+                {
+                    var eulerResult = EquationSolver.Euler(DifferentialEquationInput.Text, initialX, initialY, endX, stepSize);
+
+                    FinalRootText.Text = $"Approximate y({endX:F4}) = {eulerResult.lastY:F4}";
+                    ResultListView.ItemsSource = eulerResult.steps.Split('\n').Where(line => !string.IsNullOrWhiteSpace(line));
+                    // Update the method call to include the missing arguments
+                    PlotEulerWithComparison(
+                        DifferentialEquationInput.Text, // Pass the differential equation as a string
+                        x => EquationSolver.EvaluateFunction(DifferentialEquationInput.Text, x), // Pass a function for exact solution
+                        eulerResult.xPoints, // Pass the xPointsEuler array
+                        eulerResult.yPoints  // Pass the yPointsEuler array
+                    );
+
+                    PlotStack.Visibility = Visibility.Visible;
+                }
+                catch (Exception ex)
+                {
+                    FinalRootText.Text = $"Error: {ex.Message}";
+                    ResultListView.ItemsSource = new string[] { ex.Message };
+                    PlotStack.Visibility = Visibility.Collapsed;
+                }
+            }
         }
+
+        private void PlotEulerWithComparison(
+            string differentialEquation, // To potentially derive the exact solution if possible
+            Func<double, double> exactSolution, // A function that calculates the exact y for a given x
+            double[] xPointsEuler,
+            double[] yPointsEuler
+        )
+        {
+            // Assuming you have a ScottPlot.WinUI.PlotView control in your XAML named "WinUiPlotView"
+            PlotView.Plot.Clear();
+
+            var eulerScatter = PlotView.Plot.Add.Scatter(
+                xPointsEuler,
+                yPointsEuler,
+                color: ScottPlot.Color.FromHex("#008000") // Green color in hex
+            );
+            eulerScatter.Label = "Euler Approximation";
+            eulerScatter.MarkerSize = 5; // Set the marker size here
+
+            // Generate points for the exact solution
+            double[] xPointsExact = xPointsEuler; // Use the same x-values for comparison
+            double[] yPointsExact = xPointsExact.Select(exactSolution).ToArray();
+
+            PlotViewControl.Plot.Add.Scatter(
+                xPointsExact,
+                yPointsExact,
+                color: ScottPlot.Color.FromHex("#1a1a1a") // Green color in hex
+            ).Label = "Euler Exact";
+
+            PlotView.Plot.Title("Euler's Method vs. Exact Solution");
+            PlotView.Plot.XLabel("x");
+            PlotView.Plot.YLabel("y");
+            PlotViewControl.Plot.Legend.IsVisible = true; // Show the legend
+            PlotStack.Visibility = Visibility.Collapsed;
+            PlotView.Refresh();
+            PlotView.Visibility = Visibility.Visible;
+        }
+
 
         private void PlotTrapezoidal(string function, double a, double b, int n, double[] xPoints, double[] yPoints)
         {

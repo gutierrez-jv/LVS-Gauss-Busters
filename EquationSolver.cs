@@ -14,33 +14,23 @@ namespace LVS_Gauss_Busters
         private static string PreprocessEquation(string equation)
         {
             equation = Regex.Replace(equation, @"(\d)([a-zA-Z])", "$1*$2");
+            equation = Regex.Replace(equation, @"([a-zA-Z])(\d)", "$1*$2");
             equation = Regex.Replace(equation, @"√\(?([a-zA-Z0-9\.\+\-\*/\^]+)\)?", "Sqrt($1)", RegexOptions.IgnoreCase);
             equation = Regex.Replace(equation, @"sqrt\s*\(\s*([^)]+)\s*\)", "Sqrt($1)", RegexOptions.IgnoreCase);
-
-            // ✅ Fix log(x) issue: interpret as natural log
             equation = Regex.Replace(equation, @"(?<![a-zA-Z])log\s*\(\s*([^)]+)\s*\)", "Ln($1)", RegexOptions.IgnoreCase);
-
             equation = Regex.Replace(equation, @"(?<![a-zA-Z])e\s*\^\s*\(?([a-zA-Z0-9\.\+\-\*/\^]+)\)?", "Exp($1)", RegexOptions.IgnoreCase);
             equation = Regex.Replace(equation, @"([a-zA-Z0-9\)\.]+)\s*\^\s*\(?([\-0-9\.\/]+)\)?", "Pow($1,$2)");
-
             equation = Regex.Replace(equation, @"(?<![0-9a-zA-Z\)])(\d+)\s*/\s*(\d+)", match =>
             {
                 double numerator = double.Parse(match.Groups[1].Value);
                 double denominator = double.Parse(match.Groups[2].Value);
                 return (numerator / denominator).ToString();
             });
-
-            equation = Regex.Replace(
-                equation,
-                @"([a-zA-Z0-9\.\)\(]+)\s*\^\s*([\-]?[0-9\.]+)",
-                "Pow($1,$2)"
-            );
-
+            equation = Regex.Replace(equation, @"([a-zA-Z0-9\.\)\(]+)\s*\^\s*([\-]?[0-9\.]+)", "Pow($1,$2)");
             return equation;
         }
 
-
-        public static double EvaluateFunction(string equation, double x)
+        public static double EvaluateFunction(string equation, double x, double y = double.NaN)
         {
             try
             {
@@ -48,26 +38,35 @@ namespace LVS_Gauss_Busters
                 var expr = new Expression(processed);
                 expr.Parameters["x"] = x;
 
+                // Ensure 'y' is always defined, even if it's NaN
+                expr.Parameters["y"] = double.IsNaN(y) ? 0 : y;
+
                 expr.EvaluateFunction += (name, args) =>
                 {
                     if (name.Equals("ln", StringComparison.OrdinalIgnoreCase))
                     {
                         if (args.Parameters.Length != 1)
                             throw new ArgumentException("ln() takes exactly one argument");
-
                         double value = Convert.ToDouble(args.Parameters[0].Evaluate());
                         args.Result = Math.Log(value); // Natural log
                     }
+                    // Add other custom function handling if needed
                 };
 
-                double result = Convert.ToDouble(expr.Evaluate());
-                Console.WriteLine($"EvaluateFunction: equation = {equation}, x = {x}, result = {result}");
-                return result;
+                object result = expr.Evaluate();
+                if (result != null)
+                {
+                    return Convert.ToDouble(result);
+                }
+                else
+                {
+                    throw new Exception("Evaluation returned null.");
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error evaluating the equation '{equation}' at x = {x}: {ex.Message}");
-                throw new Exception($"Error evaluating the equation '{equation}' at x = {x}: {ex.Message}");
+                Console.WriteLine($"Error evaluating the equation '{equation}' at x = {x}, y = {y}: {ex.Message}");
+                throw;
             }
         }
 
@@ -798,6 +797,60 @@ namespace LVS_Gauss_Busters
             steps.AppendLine($"         ≈ {result:F4}");
 
             return (steps.ToString(), xValues, yValues, result);
+        }
+
+        public static (string steps, double[] xPoints, double[] yPoints, double lastY) Euler(
+            string differentialEquation,
+            double initialX,
+            double initialY,
+            double endX,
+            double stepSize
+        )
+        {
+            if (stepSize <= 0)
+            {
+                throw new ArgumentException("Step size must be positive.");
+            }
+
+            StringBuilder steps = new StringBuilder();
+            List<double> xPoints = new List<double>();
+            List<double> yPoints = new List<double>();
+
+            double currentX = initialX;
+            double currentY = initialY;
+
+            xPoints.Add(currentX);
+            yPoints.Add(currentY);
+            steps.AppendLine($"--- Euler's Method ---");
+            steps.AppendLine($"Given y' = {differentialEquation}, y({initialX}) = {initialY}, find y({endX}) with step size h = {stepSize}");
+
+            int iteration = 0;
+            while (currentX < endX)
+            {
+                double derivative = EvaluateFunction(differentialEquation, currentX, currentY);
+                double nextY = currentY + stepSize * derivative;
+                double nextX = Math.Min(currentX + stepSize, endX);
+
+                steps.AppendLine($"Iteration {iteration}:");
+                steps.AppendLine($"  x_{iteration} = {currentX:F4}, y_{iteration} = {currentY:F4}, y'({currentX:F4}, {currentY:F4}) = {derivative:F4}");
+                steps.AppendLine($"  y_{iteration + 1} = {currentY:F4} + {stepSize:F4} * {derivative:F4} = {nextY:F4}");
+
+                xPoints.Add(nextX);
+                yPoints.Add(nextY);
+
+                currentX = nextX;
+                currentY = nextY;
+                iteration++;
+
+                if (Math.Abs(currentX - endX) < 1e-9)
+                {
+                    break;
+                }
+            }
+
+            steps.AppendLine($"\nApproximate value of y({endX:F4}) ≈ {currentY:F4}");
+
+            return (steps.ToString(), xPoints.ToArray(), yPoints.ToArray(), currentY);
         }
     }
 }
