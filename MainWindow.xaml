@@ -9,176 +9,176 @@
     xmlns:scottplot="using:ScottPlot.WinUI"
     mc:Ignorable="d">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-        <Grid Background="#0B0C10" Padding="20">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+    <Grid>
+        <Grid.Background>
+            <ImageBrush Stretch="UniformToFill" Opacity="0.69">
+                <ImageBrush.ImageSource>
+                    <BitmapImage UriSource="ms-appx:///Assets/ghostbusters_bg.png"/>
+                </ImageBrush.ImageSource>
+            </ImageBrush>
+        </Grid.Background>
 
-            <Image Source="/Assets/ghostbusters_web.png"
-               Stretch="UniformToFill"
-               Opacity="0.1"
-               IsHitTestVisible="False"/>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <Grid Padding="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-            <StackPanel Grid.Row="0"
-                    Orientation="Horizontal"
-                    HorizontalAlignment="Center"
-                    Margin="0,0,0,20"
-                    VerticalAlignment="Top">
-                <Image Source="/Assets/ghostbusters_logo-removebg-preview.png"
-                   Height="80"
-                   Margin="0,0,25,0"
-                   Stretch="Uniform"/>
-                <TextBlock Text="Gauss Busters"
-                       FontSize="36"
-                       FontWeight="Bold"
-                       Foreground="#E10600"
-                       FontFamily="Rockwell"
-                       VerticalAlignment="Center"
-                       TextWrapping="Wrap"/>
-            </StackPanel>
+                <StackPanel Grid.Row="0"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            Margin="0,0,0,20"
+                            VerticalAlignment="Top">
+                    <Image Source="/Assets/ghostbusters_logo-removebgpreview-removebg-preview.png"
+                           Opacity="1.0"
+                           Height="110"
+                           Margin="0,0,25,0"
+                           Stretch="Uniform"/>
+                    <TextBlock Text="Gauss Busters"
+                               FontSize="42"
+                               FontWeight="Bold"
+                               Foreground="#E10600"
+                               FontFamily="Papyrus"
+                               VerticalAlignment="Center"
+                               TextWrapping="Wrap"/>
+                </StackPanel>
 
-            <Grid Grid.Row="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*"/>
-                    <ColumnDefinition Width="3*"/>
-                </Grid.ColumnDefinitions>
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
 
-                <StackPanel Background="#1A1A1A" CornerRadius="15" Padding="30" Spacing="15" Margin="0,0,10,0">
-                    <TextBlock Text="Select Method:" Foreground="White"/>
-                    <ComboBox x:Name="MethodSelector" Background="#2D2D2D" Foreground="White" SelectionChanged="MethodSelector_SelectionChanged">
-                        <ComboBoxItem Content="Bisection"/>
-                        <ComboBoxItem Content="Newton-Raphson"/>
-                        <ComboBoxItem Content="Secant"/>
-                        <ComboBoxItem Content="Gaussian Elimination"/>
-                        <ComboBoxItem Content="Gauss-Jordan"/>
-                        <ComboBoxItem Content="Gauss-Seidel"/>
-                        <ComboBoxItem Content="Linear Regression"/>
-                        <ComboBoxItem Content="Polynomial Regression"/>
-                        <ComboBoxItem Content="Trapezoidal"/>
-                        <ComboBoxItem Content="Simpson's 1/3"/>
-                        <ComboBoxItem Content="Euler"/>
-                    </ComboBox>
-
-                    <StackPanel x:Name="NumberOfEquationsPanel" Visibility="Collapsed">
-                        <TextBlock Text="Number of Equations:" Foreground="White" x:Name="NumberOfEquationsLabel"/>
-                        <TextBox x:Name="NumberOfEquationsTextBox" Text="3" InputScope="Number" TextChanged="NumberOfEquationsTextBox_TextChanged"/>
-                    </StackPanel>
-                    <StackPanel x:Name="SingleEquationPanel" Visibility="Collapsed">
-                        <TextBlock Text="Equation (in terms of x):" Foreground="White"/>
-                        <TextBox x:Name="EquationInput" PlaceholderText="e.g., x^2 - 2" Background="#2D2D2D" Foreground="White"/>
-                    </StackPanel>
-                    <StackPanel x:Name="InitialGuessXaPanel" Visibility="Collapsed">
-                        <TextBlock Text="Initial Guess (xa):" Foreground="White"/>
-                        <TextBox x:Name="X0Input" PlaceholderText="e.g., 1" Background="#2D2D2D" Foreground="White"/>
-                    </StackPanel>
-                    <StackPanel x:Name="InitialGuessXbPanel" Visibility="Collapsed">
-                        <TextBlock Text="Second Guess (xb):" Foreground="White"/>
-                        <TextBox x:Name="X1Input" PlaceholderText="e.g., 2" Background="#2D2D2D" Foreground="White"/>
-                    </StackPanel>
-                    <TextBlock x:Name="InitialGuessesLabel" Text="Initial Guesses:" Foreground="White" Visibility="Collapsed"/>
-                    <StackPanel x:Name="InitialGuessesInputPanel" Orientation="Vertical" Visibility="Collapsed"/>
-                    <TextBlock x:Name="EquationsLabel" Text="Equations:" Foreground="White" Visibility="Collapsed"/>
-                    <StackPanel x:Name="EquationsInputPanel" Orientation="Vertical" Visibility="Collapsed"/>
-
-                    <StackPanel x:Name="RegressionInputPanel" Visibility="Collapsed" Spacing="10" Margin="0,10,0,0">
-                        <TextBlock x:Name="PolynomialDegreeLabel" Text="Enter Polynomial Degree:" Foreground="White" Visibility="Collapsed"/>
-                        <TextBox x:Name="PolynomialDegreeTextBox" PlaceholderText="e.g., 2" Background="#2D2D2D" Foreground="White" Visibility="Collapsed"/>
-                    </StackPanel>
-
-                    <StackPanel x:Name="LinearRegressionData" Spacing="10" Margin="0,10,0,0" Visibility="Collapsed">
-                        <TextBlock Text="Number of Points:" Foreground="White"/>
-                        <ComboBox x:Name="PointCountSelector" Background="#2D2D2D" Foreground="White" SelectionChanged="PointCountSelector_SelectionChanged" Visibility="Collapsed">
-                            <ComboBoxItem Content="2"/>
-                            <ComboBoxItem Content="3"/>
-                            <ComboBoxItem Content="4"/>
-                            <ComboBoxItem Content="5"/>
-                            <ComboBoxItem Content="6"/>
-                            <ComboBoxItem Content="7"/>
-                            <ComboBoxItem Content="8"/>
-                            <ComboBoxItem Content="9"/>
-                            <ComboBoxItem Content="10"/>
-                            <ComboBoxItem Content="11"/>
-                            <ComboBoxItem Content="12"/>
-                            <ComboBoxItem Content="13"/>
-                            <ComboBoxItem Content="14"/>
-                            <ComboBoxItem Content="15"/>
+                    <StackPanel Background="#1A1A1A" Opacity="0.8" CornerRadius="15" Padding="30" Spacing="15" Margin="0,0,10,0">
+                        <TextBlock Text="Select Method:" FontFamily="Papyrus" FontSize="25" Foreground="White"/>
+                        <ComboBox x:Name="MethodSelector" Background="#2D2D2D" Foreground="White" SelectionChanged="MethodSelector_SelectionChanged">
+                            <ComboBoxItem Content="Bisection"/>
+                            <ComboBoxItem Content="Newton-Raphson"/>
+                            <ComboBoxItem Content="Secant"/>
+                            <ComboBoxItem Content="Gaussian Elimination"/>
+                            <ComboBoxItem Content="Gauss-Jordan"/>
+                            <ComboBoxItem Content="Gauss-Seidel"/>
+                            <ComboBoxItem Content="Linear Regression"/>
+                            <ComboBoxItem Content="Polynomial Regression"/>
+                            <ComboBoxItem Content="Trapezoidal"/>
+                            <ComboBoxItem Content="Simpson's 1/3"/>
+                            <ComboBoxItem Content="Euler"/>
                         </ComboBox>
-                        <StackPanel x:Name="PointInputPanel" Spacing="10" Margin="0,10,0,0" Visibility="Collapsed"/>
+
+                        <StackPanel x:Name="NumberOfEquationsPanel" Visibility="Collapsed">
+                            <TextBlock Text="Number of Equations:" Foreground="White" x:Name="NumberOfEquationsLabel"/>
+                            <TextBox x:Name="NumberOfEquationsTextBox" Text="3" InputScope="Number" TextChanged="NumberOfEquationsTextBox_TextChanged"/>
+                        </StackPanel>
+                        <StackPanel x:Name="SingleEquationPanel" Visibility="Collapsed">
+                            <TextBlock Text="Equation (in terms of x):" Foreground="White"/>
+                            <TextBox x:Name="EquationInput" PlaceholderText="e.g., x^2 - 2" Background="#2D2D2D" Foreground="White"/>
+                        </StackPanel>
+                        <StackPanel x:Name="InitialGuessXaPanel" Visibility="Collapsed">
+                            <TextBlock Text="Initial Guess (xa):" Foreground="White"/>
+                            <TextBox x:Name="X0Input" PlaceholderText="e.g., 1" Background="#2D2D2D" Foreground="White"/>
+                        </StackPanel>
+                        <StackPanel x:Name="InitialGuessXbPanel" Visibility="Collapsed">
+                            <TextBlock Text="Second Guess (xb):" Foreground="White"/>
+                            <TextBox x:Name="X1Input" PlaceholderText="e.g., 2" Background="#2D2D2D" Foreground="White"/>
+                        </StackPanel>
+                        <TextBlock x:Name="InitialGuessesLabel" Text="Initial Guesses:" Foreground="White" Visibility="Collapsed"/>
+                        <StackPanel x:Name="InitialGuessesInputPanel" Orientation="Vertical" Visibility="Collapsed"/>
+                        <TextBlock x:Name="EquationsLabel" Text="Equations:" Foreground="White" Visibility="Collapsed"/>
+                        <StackPanel x:Name="EquationsInputPanel" Orientation="Vertical" Visibility="Collapsed"/>
+
+                        <StackPanel x:Name="RegressionInputPanel" Visibility="Collapsed" Spacing="10" Margin="0,10,0,0">
+                            <TextBlock x:Name="PolynomialDegreeLabel" Text="Enter Polynomial Degree:" Foreground="White" Visibility="Collapsed"/>
+                            <TextBox x:Name="PolynomialDegreeTextBox" PlaceholderText="e.g., 2" Background="#2D2D2D" Foreground="White" Visibility="Collapsed"/>
+                        </StackPanel>
+
+                        <StackPanel x:Name="LinearRegressionData" Spacing="10" Margin="0,10,0,0" Visibility="Collapsed">
+                            <TextBlock Text="Number of Points:" Foreground="White"/>
+                            <ComboBox x:Name="PointCountSelector" Background="#2D2D2D" Foreground="White" SelectionChanged="PointCountSelector_SelectionChanged" Visibility="Collapsed">
+                                <ComboBoxItem Content="2"/>
+                                <ComboBoxItem Content="3"/>
+                                <ComboBoxItem Content="4"/>
+                                <ComboBoxItem Content="5"/>
+                                <ComboBoxItem Content="6"/>
+                                <ComboBoxItem Content="7"/>
+                                <ComboBoxItem Content="8"/>
+                                <ComboBoxItem Content="9"/>
+                                <ComboBoxItem Content="10"/>
+                                <ComboBoxItem Content="11"/>
+                                <ComboBoxItem Content="12"/>
+                                <ComboBoxItem Content="13"/>
+                                <ComboBoxItem Content="14"/>
+                                <ComboBoxItem Content="15"/>
+                            </ComboBox>
+                            <StackPanel x:Name="PointInputPanel" Spacing="10" Margin="0,10,0,0" Visibility="Collapsed"/>
+                        </StackPanel>
+
+                        <StackPanel x:Name="IntegrationInputPanel" Visibility="Collapsed" Spacing="10">
+                            <TextBlock Text="Function (e.g., x^2):" Foreground="White"/>
+                            <TextBox x:Name="IntegrationFunctionInput" PlaceholderText="Enter function" Background="#2D2D2D" Foreground="White" />
+
+                            <TextBlock Text="Lower Bound (a):" Foreground="White"/>
+                            <TextBox x:Name="IntegrationLowerBoundInput" PlaceholderText="Enter lower bound" Background="#2D2D2D" Foreground="White" />
+
+                            <TextBlock Text="Upper Bound (b):" Foreground="White"/>
+                            <TextBox x:Name="IntegrationUpperBoundInput" PlaceholderText="Enter upper bound" Background="#2D2D2D" Foreground="White" />
+
+                            <TextBlock Text="Number of Divisions (n):" Foreground="White"/>
+                            <TextBox x:Name="IntegrationDivisionsInput" PlaceholderText="Enter number of divisions" Background="#2D2D2D" Foreground="White" />
+                        </StackPanel>
+
+                        <StackPanel x:Name="EulerInputPanel" Visibility="Collapsed" Spacing="10">
+                            <TextBlock Text="Euler Method Parameters" Style="{StaticResource SubtitleTextBlockStyle}" />
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <TextBlock Text="y'(dy/dx) =" Width="65" VerticalAlignment="Center" Foreground="White"/>
+                                <TextBox x:Name="DifferentialEquationInput" Width="200" PlaceholderText="e.g., y - x^2" Background="#2D2D2D" Foreground="White"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <TextBlock Text="y(x0) =" Width="60" VerticalAlignment="Center" Foreground="White"/>
+                                <TextBox x:Name="InitialYInput" Width="80" PlaceholderText="y?" Background="#2D2D2D" Foreground="White"/>
+                                <TextBlock Text="at x0 =" Width="40" VerticalAlignment="Center" Foreground="White"/>
+                                <TextBox x:Name="InitialXInput" Width="80" PlaceholderText="x?" Background="#2D2D2D" Foreground="White"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <TextBlock Text="Point of approximation =" Width="160" VerticalAlignment="Center" Foreground="White"/>
+                                <TextBox x:Name="EndXInput" Width="80" PlaceholderText="y_at_x" Background="#2D2D2D" Foreground="White"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="5">
+                                <TextBlock Text="Step Size (h) =" Width="100" VerticalAlignment="Center" Foreground="White"/>
+                                <TextBox x:Name="StepSizeInput" Width="80" PlaceholderText="h" Background="#2D2D2D" Foreground="White"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <ToggleSwitch x:Name="MusicToggle" Header="Music" FontSize="20" FontFamily ="Papyrus" IsOn="True" Toggled="MusicToggle_Toggled" Margin="0,10,0,0"/>
+                        <Button x:Name="SolveButton" Content="BUST IT!" Click="SolveButton_Click"
+                                Height="42" Background="#E10600" FontFamily="Rockwell"
+                                Foreground="White" FontWeight="Bold" BorderBrush="White"
+                                BorderThickness="2" CornerRadius="8" Margin="0,10,0,0"/>
                     </StackPanel>
 
-                    <StackPanel x:Name="IntegrationInputPanel" Visibility="Collapsed" Spacing="10">
-                        <TextBlock Text="Function (e.g., x^2):" Foreground="White"/>
-                        <TextBox x:Name="IntegrationFunctionInput" PlaceholderText="Enter function" Background="#2D2D2D" Foreground="White" />
+                    <StackPanel Grid.Column="1" Padding="20" Background="#1A1A1A" Opacity="0.85" CornerRadius="15" Spacing="10" Margin="10,0,0,0">
+                        <TextBlock Text="Solution Steps" FontSize="26" FontWeight="Bold" FontFamily="Papyrus" Foreground="White" Margin="0 0 0 10"/>
 
-                        <TextBlock Text="Lower Bound (a):" Foreground="White"/>
-                        <TextBox x:Name="IntegrationLowerBoundInput" PlaceholderText="Enter lower bound" Background="#2D2D2D" Foreground="White" />
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" Height="350">
+                            <ListView x:Name="ResultListView" Background="#2D2D2D" Foreground="White" BorderThickness="0" SelectionMode="None">
+                                <ListView.ItemTemplate>
+                                    <DataTemplate x:DataType="x:String">
+                                        <TextBlock Text="{Binding}" FontFamily="Consolas" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </ScrollViewer>
 
-                        <TextBlock Text="Upper Bound (b):" Foreground="White"/>
-                        <TextBox x:Name="IntegrationUpperBoundInput" PlaceholderText="Enter upper bound" Background="#2D2D2D" Foreground="White" />
+                        <TextBlock x:Name="FinalRootText" Foreground="#7CFC00" FontSize="16" FontFamily="Papyrus"
+                                        FontWeight="Bold" Margin="0,10,0,0" TextWrapping="Wrap"/>
 
-                        <TextBlock Text="Number of Divisions (n):" Foreground="White"/>
-                        <TextBox x:Name="IntegrationDivisionsInput" PlaceholderText="Enter number of divisions" Background="#2D2D2D" Foreground="White" />
-                    </StackPanel>
-
-
-                    <StackPanel x:Name="EulerInputPanel" Visibility="Collapsed" Spacing="10">
-                        <TextBlock Text="Euler Method Parameters" Style="{StaticResource SubtitleTextBlockStyle}" />
-                        <StackPanel Orientation="Horizontal" Spacing="5">
-                            <TextBlock Text="y'(dy/dx) =" Width="65" VerticalAlignment="Center" Foreground="White"/>
-                            <TextBox x:Name="DifferentialEquationInput" Width="200" PlaceholderText="e.g., y - x^2" Background="#2D2D2D" Foreground="White"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Spacing="5">
-                            <TextBlock Text="y(x0) =" Width="60" VerticalAlignment="Center" Foreground="White"/>
-                            <TextBox x:Name="InitialYInput" Width="80" PlaceholderText="y?" Background="#2D2D2D" Foreground="White"/>
-                            <TextBlock Text="at x0 =" Width="40" VerticalAlignment="Center" Foreground="White"/>
-                            <TextBox x:Name="InitialXInput" Width="80" PlaceholderText="x?" Background="#2D2D2D" Foreground="White"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Spacing="5">
-                            <TextBlock Text="Point of approximation =" Width="160" VerticalAlignment="Center" Foreground="White"/>
-                            <TextBox x:Name="EndXInput" Width="80" PlaceholderText="y_at_x" Background="#2D2D2D" Foreground="White"/>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal" Spacing="5">
-                            <TextBlock Text="Step Size (h) =" Width="100" VerticalAlignment="Center" Foreground="White"/>
-                            <TextBox x:Name="StepSizeInput" Width="80" PlaceholderText="h" Background="#2D2D2D" Foreground="White"/>
+                        <StackPanel x:Name="PlotStack" Visibility="Collapsed">
+                            <TextBlock Text="Plot" FontSize="26" FontWeight="Bold" FontFamily="Papyrus" Foreground="White" Margin="0 20 0 10"/>
+                            <scottplot:WinUIPlot x:Name="PlotView" Height="300" Background="#2D2D2D" Visibility="Collapsed"/>
                         </StackPanel>
                     </StackPanel>
-
-                    <ToggleSwitch x:Name="MusicToggle" Header="Music" IsOn="True" Toggled="MusicToggle_Toggled" Margin="0,10,0,0"/>
-                    <Button x:Name="SolveButton" Content="BUST IT!" Click="SolveButton_Click"
-                            Height="45" Background="#E10600" FontFamily="Rockwell"
-                            Foreground="White" FontWeight="Bold" BorderBrush="White"
-                            BorderThickness="2" CornerRadius="8" Margin="0,10,0,0"/>
-                </StackPanel>
-
-                <!-- Output Section -->
-                <StackPanel Grid.Column="1" Padding="20" Background="#1A1A1A" CornerRadius="15" Spacing="10" Margin="10,0,0,0">
-                    <!-- Title -->
-                    <TextBlock Text="Solution Steps" FontSize="26" FontWeight="Bold" FontFamily="Rockwell" Foreground="White" Margin="0 0 0 10"/>
-
-                    <!-- Scrollable Result View -->
-                    <ScrollViewer VerticalScrollBarVisibility="Auto" Height="350">
-                        <ListView x:Name="ResultListView" Background="#2D2D2D" Foreground="White" BorderThickness="0" SelectionMode="None">
-                            <ListView.ItemTemplate>
-                                <DataTemplate x:DataType="x:String">
-                                    <TextBlock Text="{Binding}" FontFamily="Consolas" TextWrapping="Wrap" VerticalAlignment="Center"/>
-                                </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
-                    </ScrollViewer>
-
-                    <!-- Final Answer -->
-                    <TextBlock x:Name="FinalRootText" Foreground="#7CFC00" FontSize="16" FontFamily="Rockwell"
-                               FontWeight="Bold" Margin="0,10,0,0" TextWrapping="Wrap"/>
-
-                    <!-- Plot Section -->
-                    <StackPanel x:Name="PlotStack" Visibility="Collapsed">
-                        <TextBlock Text="Plot" FontSize="26" FontWeight="Bold" FontFamily="Rockwell" Foreground="White" Margin="0 20 0 10"/>
-                        <scottplot:WinUIPlot x:Name="PlotView" Height="300" Background="#2D2D2D" Visibility="Collapsed"/>
-                    </StackPanel>
-                </StackPanel>
+                </Grid>
             </Grid>
-        </Grid>
-    </ScrollViewer>
+        </ScrollViewer>
+    </Grid>
 </Window>

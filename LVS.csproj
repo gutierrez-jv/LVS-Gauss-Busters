@@ -18,7 +18,11 @@
   <ItemGroup>
     <None Remove="Assets\Audio\bg_music.mp3" />
     <None Remove="Assets\Audio\bust_it.mp3" />
+    <None Remove="Assets\ghost.png" />
+    <None Remove="Assets\ghostbusters_bg.png" />
     <None Remove="Assets\ghostbusters_logo-removebg-preview.png" />
+    <None Remove="Assets\ghostbusters_logo-removebgpreview-removebg-preview.png" />
+    <None Remove="Assets\scary.png" />
     <None Remove="Assets\web.png" />
   </ItemGroup>
 
@@ -59,7 +63,19 @@
     <Content Update="Assets\Audio\bust_it.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Update="Assets\ghost.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\ghostbusters_bg.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Update="Assets\ghostbusters_logo-removebg-preview.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\ghostbusters_logo-removebgpreview-removebg-preview.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\scary.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Update="Assets\web.png">
