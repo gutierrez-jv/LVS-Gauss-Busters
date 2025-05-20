@@ -13,10 +13,13 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <Content Remove="Assets\Audio\bust_it.wav.wav" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="Assets\Audio\bg_music.mp3" />
     <None Remove="Assets\Audio\bust_it.mp3" />
-    <None Remove="Assets\Audio\bust_it.wav" />
     <None Remove="Assets\ghostbusters_logo-removebg-preview.png" />
+    <None Remove="Assets\web.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -56,10 +59,10 @@
     <Content Update="Assets\Audio\bust_it.mp3">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="Assets\Audio\bust_it.wav">
+    <Content Update="Assets\ghostbusters_logo-removebg-preview.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Update="Assets\ghostbusters_logo-removebg-preview.png">
+    <Content Update="Assets\web.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

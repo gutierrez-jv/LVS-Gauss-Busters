@@ -9,6 +9,10 @@ using ScottPlot.WinUI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Windows.Devices.Radios;
+using Windows.Media.Playback;
+using Windows.Storage;
 
 namespace LVS_Gauss_Busters
 {
@@ -196,6 +200,7 @@ namespace LVS_Gauss_Busters
 
         private async void SolveButton_Click(object sender, RoutedEventArgs e)
         {
+            await AudioHelper.PlaySoundEffect("Assets/Audio/bust_it.mp3");
             string? method = ((ComboBoxItem?)MethodSelector.SelectedItem)?.Content?.ToString();
 
             if (string.IsNullOrEmpty(method))
@@ -204,6 +209,8 @@ namespace LVS_Gauss_Busters
                 ResultListView.ItemsSource = null;
                 return;
             }
+
+            await AudioHelper.PlaySoundEffect("Assets/Audio/bust_it.mp3");
 
             if (method == "Bisection")
             {
@@ -920,12 +927,6 @@ namespace LVS_Gauss_Busters
                 }
             }
         }
-
-
-        private async void SolveButtonSound_Click(object sender, RoutedEventArgs e)
-        {
-            await AudioHelper.PlaySoundEffectAsync("Assets/Audio/bust_it.mp3");
-        }
         private void MainWindow_Loaded(object sender, WindowActivatedEventArgs e)
         {
             AudioHelper.PlayBackgroundMusic("Assets/Audio/bg_music.mp3");
@@ -935,7 +936,7 @@ namespace LVS_Gauss_Busters
         {
             if (MusicToggle.IsOn)
             {
-                AudioHelper.PlayBackgroundMusic("Assets/Audio/bg_music.mp3"); // Re-play if toggled back on
+                AudioHelper.PlayBackgroundMusic("Assets/Audio/bust_it.mp3"); // Re-play if toggled back on
             }
             else
             {

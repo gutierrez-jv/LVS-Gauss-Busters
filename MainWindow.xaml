@@ -16,10 +16,27 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
-                <Image Source="/Assets/ghostbusters_logo-removebg-preview.png" Height="80" Margin="0,0,25,0"/>
-                <TextBlock Text="Gauss Busters" FontSize="36" FontWeight="Bold" Foreground="#E10600" FontFamily="Rockwell"
-                           VerticalAlignment="Center" TextWrapping="Wrap"/>
+            <Image Source="/Assets/ghostbusters_web.png"
+               Stretch="UniformToFill"
+               Opacity="0.1"
+               IsHitTestVisible="False"/>
+
+            <StackPanel Grid.Row="0"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    Margin="0,0,0,20"
+                    VerticalAlignment="Top">
+                <Image Source="/Assets/ghostbusters_logo-removebg-preview.png"
+                   Height="80"
+                   Margin="0,0,25,0"
+                   Stretch="Uniform"/>
+                <TextBlock Text="Gauss Busters"
+                       FontSize="36"
+                       FontWeight="Bold"
+                       Foreground="#E10600"
+                       FontFamily="Rockwell"
+                       VerticalAlignment="Center"
+                       TextWrapping="Wrap"/>
             </StackPanel>
 
             <Grid Grid.Row="1">
@@ -128,12 +145,11 @@
                         </StackPanel>
                     </StackPanel>
 
-
-                    <Button x:Name="SolveButton" Content="BUST IT!" Click="SolveButton_Click" PointerPressed="SolveButtonSound_Click"
+                    <ToggleSwitch x:Name="MusicToggle" Header="Music" IsOn="True" Toggled="MusicToggle_Toggled" Margin="0,10,0,0"/>
+                    <Button x:Name="SolveButton" Content="BUST IT!" Click="SolveButton_Click"
                             Height="45" Background="#E10600" FontFamily="Rockwell"
                             Foreground="White" FontWeight="Bold" BorderBrush="White"
                             BorderThickness="2" CornerRadius="8" Margin="0,10,0,0"/>
-                    <ToggleSwitch x:Name="MusicToggle" Header="Music" IsOn="True" Toggled="MusicToggle_Toggled" Margin="0,10,0,0"/>
                 </StackPanel>
 
                 <!-- Output Section -->

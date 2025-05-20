@@ -1,13 +1,15 @@
-﻿using Windows.Media.Playback;
-using Windows.Storage;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using Windows.Devices.Radios;
+using Windows.Media.Playback;
+using Windows.Storage;
 
 namespace LVS_Gauss_Busters.Helpers
 {
     public static class AudioHelper
     {
         private static MediaPlayer? bgPlayer;
+        private static MediaPlayer? sfxPlayer;
 
         public static void PlayBackgroundMusic(string filePath, bool loop = true, double volume = 0.5)
         {
@@ -23,28 +25,28 @@ namespace LVS_Gauss_Busters.Helpers
             bgPlayer?.Pause();
         }
 
-        public static void SetBackgroundMusicMuted(bool muted)
-        {
-            if (bgPlayer != null)
-            {
-                bgPlayer.Volume = muted ? 0.0 : 0.5;
-            }
-        }
-
-        public static async Task PlaySoundEffectAsync(string filePath, double volume = 5.0)
+        public static async Task PlaySoundEffect(string filePath, double volume = 1.0)
         {
             try
             {
-                StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(new Uri($"ms-appx:///Assets/Audio/bust_it.mp3"));
-                MediaPlayer sfxPlayer = new MediaPlayer();
+                StorageFile file = await StorageFile.GetFileFromApplicationUriAsync(new Uri($"ms-appx:///{filePath}"));
+                sfxPlayer = new MediaPlayer();
                 sfxPlayer.Source = Windows.Media.Core.MediaSource.CreateFromStorageFile(file);
                 sfxPlayer.Volume = volume;
                 sfxPlayer.Play();
-                System.Diagnostics.Debug.WriteLine($"Playing sound: {"Assets/Audio/bust_it.mp3"}, Volume: {volume}"); // Add this line
+
+                sfxPlayer.PlaybackSession.PlaybackStateChanged += (s, args) =>
+                {
+                    if (s.PlaybackState == MediaPlaybackState.None ||
+                        s.PlaybackState == MediaPlaybackState.Paused)
+                    {
+                        sfxPlayer.Dispose();
+                    }
+                };
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Error playing sound {"Assets/Audio/bust_it.mp3"}: {ex.Message}"); // Keep this
+                System.Diagnostics.Debug.WriteLine($"Error playing sound {filePath}: {ex.Message}");
             }
         }
     }
