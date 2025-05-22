@@ -17,7 +17,9 @@ namespace LVS_Gauss_Busters
             equation = Regex.Replace(equation, @"([a-zA-Z])(\d)", "$1*$2");
             equation = Regex.Replace(equation, @"√\(?([a-zA-Z0-9\.\+\-\*/\^]+)\)?", "Sqrt($1)", RegexOptions.IgnoreCase);
             equation = Regex.Replace(equation, @"sqrt\s*\(\s*([^)]+)\s*\)", "Sqrt($1)", RegexOptions.IgnoreCase);
-            equation = Regex.Replace(equation, @"(?<![a-zA-Z])log\s*\(\s*([^)]+)\s*\)", "Ln($1)", RegexOptions.IgnoreCase);
+            // Replace both log(x) and ln(x) with ln(x) for consistency
+            equation = Regex.Replace(equation, @"(?<![a-zA-Z])log\s*\(\s*([^)]+)\s*\)", "ln($1)", RegexOptions.IgnoreCase);
+            equation = Regex.Replace(equation, @"(?<![a-zA-Z])ln\s*\(\s*([^)]+)\s*\)", "ln($1)", RegexOptions.IgnoreCase);
             equation = Regex.Replace(equation, @"(?<![a-zA-Z])e\s*\^\s*\(?([a-zA-Z0-9\.\+\-\*/\^]+)\)?", "Exp($1)", RegexOptions.IgnoreCase);
             equation = Regex.Replace(equation, @"([a-zA-Z0-9\)\.]+)\s*\^\s*\(?([\-0-9\.\/]+)\)?", "Pow($1,$2)");
             equation = Regex.Replace(equation, @"(?<![0-9a-zA-Z\)])(\d+)\s*/\s*(\d+)", match =>
@@ -30,6 +32,7 @@ namespace LVS_Gauss_Busters
             return equation;
         }
 
+
         public static double EvaluateFunction(string equation, double x, double y = double.NaN)
         {
             try
@@ -37,8 +40,6 @@ namespace LVS_Gauss_Busters
                 string processed = PreprocessEquation(equation);
                 var expr = new Expression(processed);
                 expr.Parameters["x"] = x;
-
-                // Ensure 'y' is always defined, even if it's NaN
                 expr.Parameters["y"] = double.IsNaN(y) ? 0 : y;
 
                 expr.EvaluateFunction += (name, args) =>
@@ -48,10 +49,21 @@ namespace LVS_Gauss_Busters
                         if (args.Parameters.Length != 1)
                             throw new ArgumentException("ln() takes exactly one argument");
                         double value = Convert.ToDouble(args.Parameters[0].Evaluate());
-                        args.Result = Math.Log(value); // Natural log
+                        if (value <= 0)
+                            throw new ArgumentException("ln(x) is undefined for x <= 0");
+                        args.Result = Math.Log(value);
                     }
-                    // Add other custom function handling if needed
+                    else if (name.Equals("log", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (args.Parameters.Length != 1)
+                            throw new ArgumentException("log() takes exactly one argument");
+                        double value = Convert.ToDouble(args.Parameters[0].Evaluate());
+                        if (value <= 0)
+                            throw new ArgumentException("log(x) is undefined for x <= 0");
+                        args.Result = Math.Log10(value); // Base-10 log
+                    }
                 };
+
 
                 object result = expr.Evaluate();
                 if (result != null)

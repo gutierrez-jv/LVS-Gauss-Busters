@@ -202,7 +202,6 @@ namespace LVS_Gauss_Busters
         {
             await AudioHelper.PlaySoundEffect("Assets/Audio/bust_it.mp3");
             string? method = ((ComboBoxItem?)MethodSelector.SelectedItem)?.Content?.ToString();
-
             if (string.IsNullOrEmpty(method))
             {
                 FinalRootText.Text = "Please select a method.";
@@ -727,6 +726,15 @@ namespace LVS_Gauss_Busters
             // Assuming you have a ScottPlot.WinUI.PlotView control in your XAML named "WinUiPlotView"
             PlotView.Plot.Clear();
 
+            // Apply dark theme
+            PlotView.Plot.FigureBackground.Color = ScottPlot.Color.FromHex("#1a1a1a");
+            PlotView.Plot.DataBackground.Color = ScottPlot.Color.FromHex("#1a1a1a");
+            PlotView.Plot.Axes.Color(ScottPlot.Color.FromHex("#d7d7d7"));
+            PlotView.Plot.Grid.MajorLineColor = ScottPlot.Color.FromHex("#3a3a3a");
+            PlotView.Plot.Legend.BackgroundColor = ScottPlot.Color.FromHex("#3a3a3a");
+            PlotView.Plot.Legend.FontColor = ScottPlot.Color.FromHex("#e10600");
+            PlotView.Plot.Legend.OutlineColor = ScottPlot.Color.FromHex("#e10600");
+
             var eulerScatter = PlotView.Plot.Add.Scatter(
                 xPointsEuler,
                 yPointsEuler,
@@ -742,7 +750,7 @@ namespace LVS_Gauss_Busters
             PlotViewControl.Plot.Add.Scatter(
                 xPointsExact,
                 yPointsExact,
-                color: ScottPlot.Color.FromHex("#1a1a1a") // Green color in hex
+                color: ScottPlot.Color.FromHex("#800000") // Green color in hex
             ).Label = "Euler Exact";
 
             PlotView.Plot.Title("Euler's Method vs. Exact Solution");
